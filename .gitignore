@@ -1,4 +1,6 @@
 # Binaries for programs and plugins
+devopstest-darwin-amd64
+metricstest
 *.exe
 *.exe~
 *.dll
@@ -17,7 +19,9 @@ cmd/gophermart/gophermart
 
 # Dependency directories (remove the comment below to include it)
 vendor/
+docker/
 
 # IDEs directories
 .idea
 .vscode
+.DS_Store
