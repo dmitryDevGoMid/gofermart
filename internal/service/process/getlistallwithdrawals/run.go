@@ -42,10 +42,14 @@ func GetAllListWithdrawalsRun(ctx context.Context, c *gin.Context, cfg *config.C
 
 	//Устанавливаем контекст запроса gin
 	data.Default.Ctx = c
+
 	//Устанавливаем конфигурационные данные
 	data.Default.Cfg = cfg
+	data.Default.Ctx.Writer.Header().Set("Content-Type", "application/json")
+
 	//Устанавливаем канал завершения процесса
 	data.Default.Finished = finished
+
 	//Устанавливаем репозитарий для данных из базы
 	data.Default.Repository = rep
 
