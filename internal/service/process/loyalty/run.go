@@ -46,17 +46,17 @@ func LoyaltyRun(ctx context.Context, cfg *config.Config, repository repository.R
 
 	//Отправляем данные в потоке в лояльность
 	p.AddPipe(RequestLoyalty{}, &pipeline2.PipelineOpts{
-		MaxWorkers: 100,
+		MaxWorkers: 1,
 	})
 
 	//Обрабатываем ответ
 	p.AddPipe(ResponseLoyalty{}, &pipeline2.PipelineOpts{
-		MaxWorkers: 100,
+		MaxWorkers: 1,
 	})
 
 	//Изменяем данные
 	p.AddPipe(CahngeDataByResponseLoyalty{}, &pipeline2.PipelineOpts{
-		MaxWorkers: 100,
+		MaxWorkers: 1,
 	})
 
 	if err := p.Start(); err != nil {
