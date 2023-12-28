@@ -1,6 +1,7 @@
 package getlistallwithdrawals
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -32,7 +33,7 @@ func (m HandlerGetListAllOrdersByWithDraw) Process(result pipeline.Message) ([]p
 		data.Default.ResponseError = func() {
 			data.Default.Ctx.Status(204)
 		}
-		return []pipeline.Message{data}, nil
+		return []pipeline.Message{data}, errors.New("empty data response list drawals")
 	}
 
 	data.Withdraw.WithdrawList = &listWithdrawals

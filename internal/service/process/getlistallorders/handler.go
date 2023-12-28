@@ -1,6 +1,7 @@
 package getlistallorders
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -32,7 +33,7 @@ func (m HandlerGetListAllOrdersByAccrual) Process(result pipeline.Message) ([]pi
 		data.Default.ResponseError = func() {
 			data.Default.Ctx.Status(204)
 		}
-		return []pipeline.Message{data}, nil
+		return []pipeline.Message{data}, errors.New("empty data response list accrual")
 	}
 
 	data.Accrual.AccrualList = &listOrders
