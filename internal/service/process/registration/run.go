@@ -52,7 +52,7 @@ func RegistrationRun(ctx context.Context, c *gin.Context, cfg *config.Config, re
 		MaxWorkers: 1,
 	})
 
-	p.AddPipe(authentication.CheckJWTToken{}, &pipeline.PipelineOpts{
+	p.AddPipe(ResponseRegistration{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
