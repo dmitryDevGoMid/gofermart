@@ -19,7 +19,7 @@ func (m RequestLoyalty) Process(result pipeline2.Message) ([]pipeline2.Message, 
 	client := resty.New()
 
 	//fmt.Println(data.Accrual.Accrual.IDorder)
-	urlMetrics := fmt.Sprintf("%s/api/orders/%s/", data.Default.Cfg.AccrualSystem.AccrualSystem, data.Loyalty.Accrual.IDorder)
+	urlMetrics := fmt.Sprintf("%s/api/orders/%s", data.Default.Cfg.AccrualSystem.AccrualSystem, data.Loyalty.Accrual.IDorder)
 
 	//fmt.Println(urlMetrics)
 	//fmt.Println(urlMetrics)
