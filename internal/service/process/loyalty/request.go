@@ -52,7 +52,7 @@ func (m RequestLoyalty) Process(result pipeline2.Message) ([]pipeline2.Message, 
 	data.Loyalty.Response = response.Body()
 
 	data.Default.Response = func() {
-		//fmt.Println(response)
+		fmt.Println("LOYLTY RESPONSE BODY=====>", response)
 	}
 
 	return []pipeline2.Message{data}, nil
