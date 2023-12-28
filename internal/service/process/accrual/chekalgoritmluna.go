@@ -20,9 +20,9 @@ func (m AccrualCheckAlgoritmLuna) Process(result pipeline.Message) ([]pipeline.M
 
 	accrual := &repository.Accrual{}
 
-	accrual.IdOrder = string(data.Default.Body)
+	accrual.IDorder = string(data.Default.Body)
 
-	err := luna.Validate(accrual.IdOrder)
+	err := luna.Validate(accrual.IDorder)
 
 	//Проверяем номер на валидность
 	if err != nil {

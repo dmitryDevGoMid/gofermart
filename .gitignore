@@ -22,6 +22,6 @@ vendor/
 docker/
 
 # IDEs directories
-.idea
+.IDea
 .vscode
 .DS_Store

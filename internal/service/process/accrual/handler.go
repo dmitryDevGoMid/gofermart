@@ -17,7 +17,7 @@ func (m HandlerAccrual) Process(result pipeline.Message) ([]pipeline.Message, er
 
 	data := result.(*service.Data)
 
-	err := data.Default.Repository.SelectAccrualByIdOrder(data.Default.Ctx.Request.Context(), &data.Accrual.Accrual)
+	err := data.Default.Repository.SelectAccrualByIDorder(data.Default.Ctx.Request.Context(), &data.Accrual.Accrual)
 
 	if err != nil {
 		data.Default.ResponseError = func() {
@@ -27,19 +27,19 @@ func (m HandlerAccrual) Process(result pipeline.Message) ([]pipeline.Message, er
 		return []pipeline.Message{data}, err
 	}
 
-	if data.Accrual.Accrual.Id != 0 {
-		if data.Accrual.Accrual.IdUser != data.User.User.Id {
+	if data.Accrual.Accrual.ID != 0 {
+		if data.Accrual.Accrual.IDUser != data.User.User.ID {
 			data.Default.ResponseError = func() {
 				data.Default.Ctx.Status(409)
 			}
 
-			return []pipeline.Message{data}, errors.New("Invalid Accrual Upload Another Users")
+			return []pipeline.Message{data}, errors.New("invalid accrual upload another uers")
 		} else {
 			data.Default.ResponseError = func() {
 				data.Default.Ctx.Status(http.StatusOK)
 			}
 
-			return []pipeline.Message{data}, errors.New("Invalid Accrual ID ORDER IS EXISTS")
+			return []pipeline.Message{data}, errors.New("invalid accrual id order is exists")
 		}
 
 	}

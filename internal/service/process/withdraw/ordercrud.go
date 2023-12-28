@@ -14,7 +14,7 @@ type OrderCRUDWithdraw struct{}
 func (m OrderCRUDWithdraw) Process(result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
-	data.Withdraw.Withdraw.IdUser = data.User.User.Id
+	data.Withdraw.Withdraw.IDUser = data.User.User.ID
 
 	err := data.Default.Repository.InsertWithdraw(data.Default.Ctx.Request.Context(), &data.Withdraw.Withdraw)
 

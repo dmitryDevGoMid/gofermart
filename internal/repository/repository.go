@@ -32,7 +32,7 @@ type Repository interface {
 	SelectUserByEmail(ctx context.Context, dataUser *User) (*User, error)
 
 	SelectAccrualByUser(ctx context.Context, dataUser *User) ([]AccrualList, error)
-	SelectAccrualByIdOrder(ctx context.Context, dataAccrual *Accrual) error
+	SelectAccrualByIDorder(ctx context.Context, dataAccrual *Accrual) error
 	SelectAccrualForSendLoyalty(ctx context.Context, dataAccrual *[]Accrual) error
 
 	SelectWithdrawByUsers(ctx context.Context, dataUser *User) ([]WithdrawList, error)
@@ -83,7 +83,7 @@ func (rep *repository) InitCatalogData(ctx context.Context) error {
 // ################################# UPDATE ########################################
 func (rep *repository) UpdateAccrualById(ctx context.Context, dataAccrual *Accrual) error {
 	sqlStatement := `UPDATE user_accrual SET accrual = $1, id_status = $2  WHERE id = $3;`
-	_, err := rep.db.Exec(ctx, sqlStatement, dataAccrual.Accrual, dataAccrual.IdStatus, dataAccrual.Id)
+	_, err := rep.db.Exec(ctx, sqlStatement, dataAccrual.Accrual, dataAccrual.IDStatus, dataAccrual.ID)
 
 	if err != nil {
 		return fmt.Errorf("error update Accrual: %v", err)
@@ -91,7 +91,7 @@ func (rep *repository) UpdateAccrualById(ctx context.Context, dataAccrual *Accru
 
 	//updateCount := res.RowsAffected()
 
-	//fmt.Printf("Обновили: id = %d, count = %d", dataAccrual.Id, updateCount)
+	//fmt.Printf("Обновили: id = %d, count = %d", dataAccrual.ID, updateCount)
 
 	return nil
 }
@@ -102,7 +102,7 @@ func (rep *repository) UpdateAccrualById(ctx context.Context, dataAccrual *Accru
 func (rep *repository) SelectUserByEmail(ctx context.Context, dataUser *User) (*User, error) {
 	// Query for a value based on a single row.
 	if err := rep.db.QueryRow(ctx, "SELECT password, id FROM users WHERE login = $1",
-		dataUser.Login).Scan(&dataUser.Password, &dataUser.Id); err != nil {
+		dataUser.Login).Scan(&dataUser.Password, &dataUser.ID); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -122,9 +122,9 @@ func (rep *repository) SelectWithdrawByUserSum(ctx context.Context, dataUser *Us
 
 	sumSum = 0
 
-	sqlQuery := `SELECT coalesce(SUM(sum), 0.00) as sum_withdraw FROM user_withdraw inner join type_status on user_withdraw.id_status = type_status.id  
+	sqlQuery := `SELECT coalesce(SUM(sum), 0.00) as sum_withdraw FROM user_withdraw inner join type_status on user_withdraw.ID_status = type_status.ID  
 						Where id_user = $1 and type_status.name = $2`
-	row := rep.db.QueryRow(ctx, sqlQuery, dataUser.Id, status)
+	row := rep.db.QueryRow(ctx, sqlQuery, dataUser.ID, status)
 
 	err := row.Scan(&sumSum)
 
@@ -147,9 +147,9 @@ func (rep *repository) SelectAccrualByUserSum(ctx context.Context, dataUser *Use
 
 	sumAccrual = 0
 
-	sqlQuery := `SELECT coalesce(SUM(accrual), 0.00) as sum_accrual FROM user_accrual inner join type_status on user_accrual.id_status = type_status.id
+	sqlQuery := `SELECT coalesce(SUM(accrual), 0.00) as sum_accrual FROM user_accrual inner join type_status on user_accrual.ID_status = type_status.ID
 					Where id_user = $1 and type_status.name = $2`
-	row := rep.db.QueryRow(ctx, sqlQuery, dataUser.Id, status)
+	row := rep.db.QueryRow(ctx, sqlQuery, dataUser.ID, status)
 
 	err := row.Scan(&sumAccrual)
 
@@ -169,7 +169,7 @@ func (rep *repository) SelectWithdrawByUser(ctx context.Context, dataUser *User)
 	withdraw := WithdrawList{}
 
 	sqlQuery := `SELECT id_order, sum, date_trunc('second',processed_at::timestamptz) FROM user_withdraw Where id_user = $1`
-	rowsAccrual, err := rep.db.Query(ctx, sqlQuery, dataUser.Id)
+	rowsAccrual, err := rep.db.Query(ctx, sqlQuery, dataUser.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error select all accrual SelectWithdrawByUser: %v", err)
 	}
@@ -180,7 +180,7 @@ func (rep *repository) SelectWithdrawByUser(ctx context.Context, dataUser *User)
 	}()
 
 	for rowsAccrual.Next() {
-		err = rowsAccrual.Scan(&withdraw.IdOrder, &withdraw.Sum, &withdraw.ProcessedAt)
+		err = rowsAccrual.Scan(&withdraw.IDorder, &withdraw.Sum, &withdraw.ProcessedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -195,9 +195,9 @@ func (rep *repository) SelectAccrualByUser(ctx context.Context, dataUser *User) 
 	accrualCollect := []AccrualList{}
 	accrual := AccrualList{}
 	sqlQuery := `SELECT id_order, accrual, type_status.name as status, date_trunc('second',uploaded_at::timestamptz)
-					FROM user_accrual inner join type_status on user_accrual.id_status = type_status.id  
+					FROM user_accrual inner join type_status on user_accrual.ID_status = type_status.ID  
 						Where id_user = $1`
-	rowsAccrual, err := rep.db.Query(ctx, sqlQuery, dataUser.Id)
+	rowsAccrual, err := rep.db.Query(ctx, sqlQuery, dataUser.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error select all accrual SelectAccrualByUser: %v", err)
 	}
@@ -208,7 +208,7 @@ func (rep *repository) SelectAccrualByUser(ctx context.Context, dataUser *User) 
 	}()
 
 	for rowsAccrual.Next() {
-		err = rowsAccrual.Scan(&accrual.IdOrder, &accrual.Accrual, &accrual.Status, &accrual.UploadedAt)
+		err = rowsAccrual.Scan(&accrual.IDorder, &accrual.Accrual, &accrual.Status, &accrual.UploadedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -255,13 +255,13 @@ func (rep *repository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccr
 }
 
 // Получаем запись из таблицы по номеру заказа
-func (rep *repository) SelectAccrualByIdOrder(ctx context.Context, dataAccrual *Accrual) error {
-	rows, err := rep.db.Query(ctx, "SELECT * FROM user_accrual Where id_order = $1", dataAccrual.IdOrder)
+func (rep *repository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *Accrual) error {
+	rows, err := rep.db.Query(ctx, "SELECT * FROM user_accrual Where id_order = $1", dataAccrual.IDorder)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil
 		}
-		log.Println("Error querying SelectAccrualByIdOrder", err)
+		log.Println("Error querying SelectAccrualByIDorder", err)
 		return err
 	}
 
@@ -290,7 +290,7 @@ func (rep *repository) SelectWithdrawByUsers(ctx context.Context, dataUser *User
 	withdraw := WithdrawList{}
 
 	sqlQuery := `SELECT id_order, sum, date_trunc('second',processed_at::timestamptz) FROM user_withdraw Where id_user = $1`
-	rowsWithdraw, err := rep.db.Query(ctx, sqlQuery, dataUser.Id)
+	rowsWithdraw, err := rep.db.Query(ctx, sqlQuery, dataUser.ID)
 	if err != nil {
 		return nil, fmt.Errorf("error select all accrual SelectWithdrawByUsers: %v", err)
 	}
@@ -302,7 +302,7 @@ func (rep *repository) SelectWithdrawByUsers(ctx context.Context, dataUser *User
 	}()
 
 	for rowsWithdraw.Next() {
-		err = rowsWithdraw.Scan(&withdraw.IdOrder, &withdraw.Sum, &withdraw.ProcessedAt)
+		err = rowsWithdraw.Scan(&withdraw.IDorder, &withdraw.Sum, &withdraw.ProcessedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -316,7 +316,7 @@ func (rep *repository) SelectWithdrawByUsers(ctx context.Context, dataUser *User
 func (rep *repository) SelectBalanceByUser(ctx context.Context, dataUser *User) (Balance, error) {
 	balanceUser := Balance{}
 	if err := rep.db.QueryRow(ctx, "SELECT * FROM user_balance WHERE id_user = $1",
-		dataUser.Id).Scan(&balanceUser); err != nil {
+		dataUser.ID).Scan(&balanceUser); err != nil {
 		return Balance{}, err
 	}
 
@@ -345,7 +345,7 @@ func (rep *repository) SelectTypeStatusAll(ctx context.Context) error {
 	fmt.Println("SelectTypeStatusAll")
 
 	type TypeStatus struct {
-		Id   int    `db:"id"`
+		ID   int    `db:"id"`
 		Name string `db:"name"`
 	}
 
@@ -365,13 +365,13 @@ func (rep *repository) SelectTypeStatusAll(ctx context.Context) error {
 	}()
 
 	for rowsTypeStatus.Next() {
-		err = rowsTypeStatus.Scan(&typeStatus.Id, &typeStatus.Name)
+		err = rowsTypeStatus.Scan(&typeStatus.ID, &typeStatus.Name)
 
 		if err != nil {
 			return err
 		}
 
-		rep.catalogData.TypeStatus[typeStatus.Name] = typeStatus.Id
+		rep.catalogData.TypeStatus[typeStatus.Name] = typeStatus.ID
 	}
 
 	return nil
@@ -394,21 +394,21 @@ func (rep *repository) InsertUser(ctx context.Context, dataUser *User) (*User, e
 		return nil, err
 	}
 
-	dataUser.Id = idInsertRow
+	dataUser.ID = idInsertRow
 
 	return dataUser, nil
 }
 
 func (rep *repository) InsertAccrual(ctx context.Context, accrual *Accrual) error {
 	fmt.Println("DB insertAccrual")
-
+	fmt.Println("InsertAccrual:", rep.catalogData.TypeStatus["NEW"])
 	_, err := rep.db.Exec(ctx,
-		"INSERT INTO user_accrual(id_user, id_order, accrual, id_status) VALUES (@iduser, @idorder, @accrual, @idstatus)",
+		"INSERT INTO user_accrual(id_user, id_order, accrual, id_status) VALUES (@IDUser, @IDorder, @accrual, @IDStatus)",
 		pgx.NamedArgs{
-			"iduser":   accrual.IdUser,
-			"idorder":  accrual.IdOrder,
+			"IDUser":   accrual.IDUser,
+			"IDorder":  accrual.IDorder,
 			"accrual":  accrual.Accrual,
-			"idstatus": rep.catalogData.TypeStatus["NEW"],
+			"IDStatus": rep.catalogData.TypeStatus["NEW"],
 		})
 
 	fmt.Println(rep.catalogData.TypeStatus)
@@ -424,12 +424,12 @@ func (rep *repository) InsertWithdraw(ctx context.Context, withdraw *Withdraw) e
 	fmt.Println("DB insertWithdraw")
 
 	_, err := rep.db.Exec(ctx,
-		"INSERT INTO user_withdraw(id_user, id_order, sum, id_status) VALUES (@iduser, @idorder, @sum, @idstatus)",
+		"INSERT INTO user_withdraw(id_user, id_order, sum, id_status) VALUES (@IDUser, @IDorder, @sum, @IDStatus)",
 		pgx.NamedArgs{
-			"iduser":   withdraw.IdUser,
-			"idorder":  withdraw.IdOrder,
+			"IDUser":   withdraw.IDUser,
+			"IDorder":  withdraw.IDorder,
 			"sum":      withdraw.Sum,
-			"idstatus": rep.catalogData.TypeStatus["PROCESSED"],
+			"IDStatus": rep.catalogData.TypeStatus["PROCESSED"],
 		})
 
 	if err != nil {
@@ -443,9 +443,9 @@ func (rep *repository) InsertBalance(ctx context.Context, balance *Balance) erro
 	fmt.Println("DB insertBalance")
 
 	_, err := rep.db.Exec(ctx,
-		"INSERT INTO user_balance(id_user, accrual, with_draw) VALUES (@iduser, @accrual, @withdraw)",
+		"INSERT INTO user_balance(id_user, accrual, with_draw) VALUES (@IDUser, @accrual, @withdraw)",
 		pgx.NamedArgs{
-			"iduser":   balance.IdUser,
+			"IDUser":   balance.IDUser,
 			"accrual":  balance.Accrual,
 			"withdraw": balance.Withdraw,
 		})

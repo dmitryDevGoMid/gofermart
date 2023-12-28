@@ -14,7 +14,7 @@ type OrderCRUDAccrual struct{}
 func (m OrderCRUDAccrual) Process(result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
-	data.Accrual.Accrual.IdUser = data.User.User.Id
+	data.Accrual.Accrual.IDUser = data.User.User.ID
 
 	err := data.Default.Repository.InsertAccrual(data.Default.Ctx.Request.Context(), &data.Accrual.Accrual)
 

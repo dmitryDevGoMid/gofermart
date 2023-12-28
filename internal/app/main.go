@@ -37,9 +37,6 @@ func Run() {
 	//Инициализируем репозитарий
 	repository := repository.NewRepository(dbConnection.DB())
 
-	//Заполняем справочники
-	repository.InitCatalogData(ctx)
-
 	//Запускаем обработчики запросов http
 	handlers.NewHandlers(ctx, router, cfg, repository)
 
@@ -49,10 +46,13 @@ func Run() {
 	go loyalty.Start(ctx, cfg, repository)
 
 	//Удаляем таблицы из БД
-	dbMigration.RunDrop(ctx)
+	//dbMigration.RunDrop(ctx)
 
 	//Создаем таблицы в БД
 	dbMigration.RunCreate(ctx)
+
+	//Заполняем справочники
+	repository.InitCatalogData(ctx)
 
 	srv := &http.Server{
 		Addr:    cfg.Server.Address,

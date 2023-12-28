@@ -244,11 +244,11 @@ func (m *migration) SetDataForTest() string {
 		rand.Seed(time.Now().UnixNano())
 		min := 1
 		max := 5
-		id_status := rand.Intn(max-min+1) + min
+		idStatus := rand.Intn(max-min+1) + min
 		accrual := (rand.Float32() * 10) + 10
 
 		order := luna.Generate(10)
-		insert = insert + fmt.Sprintf("INSERT INTO user_accrual(id_user,id_order,accrual, id_status) VALUES(1,'%s',%v,%d);\n", order, accrual, id_status)
+		insert = insert + fmt.Sprintf("INSERT INTO user_accrual(id_user,id_order,accrual, id_status) VALUES(1,'%s',%v,%d);\n", order, accrual, idStatus)
 	}
 
 	return `

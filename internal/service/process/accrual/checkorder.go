@@ -16,7 +16,7 @@ func (m HandlerAccrualCheckOrder) Process(result pipeline.Message) ([]pipeline.M
 
 	accrual := &repository.Accrual{}
 
-	accrual.IdOrder = string(data.Default.Body)
+	accrual.IDorder = string(data.Default.Body)
 
 	fmt.Println(*accrual)
 

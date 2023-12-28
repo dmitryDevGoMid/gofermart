@@ -7,45 +7,45 @@ type Datas struct {
 }
 
 type User struct {
-	Id       int    `db:"id"`
+	ID       int    `db:"id"`
 	Login    string `db:"login"`
 	Password string `db:"password"`
 }
 
 type Accrual struct {
-	Id         int       `db:"id"`
-	IdUser     int       `db:"id_user"`
-	IdOrder    string    `db:"id_order" json:"number"`
+	ID         int       `db:"id"`
+	IDUser     int       `db:"id_user"`
+	IDorder    string    `db:"id_order" json:"number"`
 	Accrual    float32   `db:"accrual,omitempty" json:"accrual,omitempty"`
-	IdStatus   int       `db:"id_status" json:"id_status"`
+	IDStatus   int       `db:"id_status" json:"id_status"`
 	UploadedAt time.Time `db:"uploaded_at" json:"uploaded_at"`
 }
 
 type AccrualList struct {
-	IdOrder    string    `db:"id_order" json:"number"`
+	IDorder    string    `db:"id_order" json:"number"`
 	Accrual    float32   `db:"accrual,omitempty" json:"accrual,omitempty"`
 	Status     string    `db:"status" json:"status"`
 	UploadedAt time.Time `db:"uploaded_at" json:"uploaded_at"`
 }
 
 type Withdraw struct {
-	Id          int       `db:"id"`
-	IdUser      int       `db:"id_user"`
-	IdOrder     string    `db:"id_order" json:"order"`
+	ID          int       `db:"id"`
+	IDUser      int       `db:"id_user"`
+	IDorder     string    `db:"id_order" json:"order"`
 	Sum         float32   `db:"sum" json:"sum"`
-	IdStatus    int       `db:"id_status" json:"id_status"`
+	IDStatus    int       `db:"id_status" json:"id_status"`
 	ProcessedAt time.Time `db:"processed_at" json:"processed_at"`
 }
 
 type WithdrawList struct {
-	IdOrder     string    `db:"id_order" json:"order"`
+	IDorder     string    `db:"id_order" json:"order"`
 	Sum         float32   `db:"sum,omitempty" json:"sum,omitempty"`
 	ProcessedAt time.Time `db:"processed_at" json:"processed_at"`
 }
 
 type Balance struct {
-	Id       int
-	IdUser   int
+	ID       int
+	IDUser   int
 	Accrual  float32
 	Withdraw float32
 }

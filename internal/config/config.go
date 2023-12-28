@@ -107,7 +107,7 @@ func init() {
 	flag.BoolVar(&enableGzip, "gzip", false, "set gzip for agent and server")
 
 	//File
-	flag.BoolVar(&restoreFile, "r", true, "restore file")
+	flag.BoolVar(&restoreFile, "rf", true, "restore file")
 	//flag.StringVar(&fileStoragePath, "f", "/tmp/metrics-db.json", "path file")
 	flag.StringVar(&fileStoragePath, "f", "/tmp/metrics-db.json", "path file")
 	flag.IntVar(&storeIntervalFile, "i", 300, "store interval file")
@@ -124,7 +124,7 @@ func init() {
 	flag.StringVar(&keySHA256, "k", "", "set key for calc SHA256")
 
 	//Flag adres accrual system
-	flag.StringVar(&accrualSystemAdress, "-r", "http://localhost:8080", "set adress for send loaylte accrual")
+	flag.StringVar(&accrualSystemAdress, "r", "http://localhost:8080", "set adress for send loaylte accrual")
 }
 
 // Разбираем конфигурацию по структурам

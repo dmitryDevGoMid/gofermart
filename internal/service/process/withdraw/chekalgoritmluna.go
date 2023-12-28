@@ -17,7 +17,7 @@ func (m WithDrawCheckAlgoritmLuna) Process(result pipeline.Message) ([]pipeline.
 
 	data := result.(*service.Data)
 
-	err := luna.Validate(data.Withdraw.Withdraw.IdOrder)
+	err := luna.Validate(data.Withdraw.Withdraw.IDorder)
 
 	//Проверяем номер на валидность
 	if err != nil {

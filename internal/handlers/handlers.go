@@ -29,11 +29,8 @@ func NewHandlers(ctx context.Context, r *gin.Engine, cfg *config.Config, reposit
 
 			registration.RegistrationRun(ctx, c, cfg, repository, finished, &sync)
 
-			select {
-			case <-finished:
-				fmt.Println("STOP REGISTER!")
-				return
-			}
+			<-finished
+			fmt.Println("STOP REGISTER!")
 		})
 		api.POST("/login/", func(c *gin.Context) {
 
@@ -43,11 +40,8 @@ func NewHandlers(ctx context.Context, r *gin.Engine, cfg *config.Config, reposit
 
 			login.LoginRun(ctx, c, cfg, repository, finished, &sync)
 
-			select {
-			case <-finished:
-				fmt.Println("STOP LOGIN!")
-				return
-			}
+			<-finished
+			fmt.Println("STOP LOGIN!")
 		})
 		api.POST("/orders/", func(c *gin.Context) {
 
@@ -57,11 +51,8 @@ func NewHandlers(ctx context.Context, r *gin.Engine, cfg *config.Config, reposit
 
 			accrual.AccrualRun(ctx, c, cfg, repository, finished, &sync)
 
-			select {
-			case <-finished:
-				fmt.Println("STOP ADD ORDERS!")
-				return
-			}
+			<-finished
+			fmt.Println("STOP ADD ORDERS!")
 		})
 		api.GET("/orders/", func(c *gin.Context) {
 
@@ -69,10 +60,8 @@ func NewHandlers(ctx context.Context, r *gin.Engine, cfg *config.Config, reposit
 
 			getlistallorders.GetAllListOrtdersRun(ctx, c, cfg, repository, finished)
 
-			select {
-			case <-finished:
-				return
-			}
+			<-finished
+			fmt.Println("STOP LIST ORDERS!")
 		})
 		api.GET("/balance/", func(c *gin.Context) {
 			var sync sync.Mutex
@@ -81,10 +70,8 @@ func NewHandlers(ctx context.Context, r *gin.Engine, cfg *config.Config, reposit
 
 			balance.BalanceRun(ctx, c, cfg, repository, finished, &sync)
 
-			select {
-			case <-finished:
-				return
-			}
+			<-finished
+			fmt.Println("STOP GET BALANCE!")
 		})
 		api.POST("/balance/withdraw/", func(c *gin.Context) {
 
@@ -94,10 +81,8 @@ func NewHandlers(ctx context.Context, r *gin.Engine, cfg *config.Config, reposit
 
 			withdraw.WithdrawRun(ctx, c, cfg, repository, finished, &sync)
 
-			select {
-			case <-finished:
-				return
-			}
+			<-finished
+			fmt.Println("STOP ADD WITHDRAW!")
 			// Handle request for version 2 of users route
 		})
 		api.GET("/withdrawals/", func(c *gin.Context) {
@@ -105,10 +90,8 @@ func NewHandlers(ctx context.Context, r *gin.Engine, cfg *config.Config, reposit
 
 			getlistallwithdrawals.GetAllListWithdrawalsRun(ctx, c, cfg, repository, finished)
 
-			select {
-			case <-finished:
-				return
-			}
+			<-finished
+			fmt.Println("STOP GET withdrawals!")
 		})
 	}
 }
