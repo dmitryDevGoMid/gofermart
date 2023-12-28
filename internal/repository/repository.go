@@ -11,7 +11,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
 	"log"
@@ -103,7 +102,7 @@ func (rep *repository) SelectUserByEmail(ctx context.Context, dataUser *User) (*
 	// Query for a value based on a single row.
 	if err := rep.db.QueryRow(ctx, "SELECT password, id FROM users WHERE login = $1",
 		dataUser.Login).Scan(&dataUser.Password, &dataUser.ID); err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return nil, nil
 		}
 		return nil, err
@@ -254,7 +253,7 @@ func (rep *repository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccr
 func (rep *repository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *Accrual) error {
 	rows, err := rep.db.Query(ctx, "SELECT * FROM user_accrual Where id_order = $1", dataAccrual.IDorder)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if err == pgx.ErrNoRows {
 			return nil
 		}
 		log.Println("Error querying SelectAccrualByIDorder", err)
