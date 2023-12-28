@@ -30,7 +30,7 @@ func (m OrderCRUDWithdraw) Process(result pipeline.Message) ([]pipeline.Message,
 	}
 
 	data.Default.Response = func() {
-		data.Default.Ctx.Status(202)
+		data.Default.Ctx.Status(200)
 	}
 
 	return []pipeline.Message{data}, nil
