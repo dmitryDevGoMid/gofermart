@@ -45,5 +45,7 @@ func (m Gzip) Process(result pipeline.Message) ([]pipeline.Message, error) {
 
 	data.Default.Body = body
 
+	fmt.Println("BODY====>", data.Default.Body)
+
 	return []pipeline.Message{data}, nil
 }
