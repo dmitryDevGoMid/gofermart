@@ -43,7 +43,7 @@ func Run() {
 	fmt.Println(cfg.Server.Address)
 
 	//Удаляем таблицы из БД
-	dbMigration.RunDrop(ctx)
+	//dbMigration.RunDrop(ctx)
 
 	//Создаем таблицы в БД
 	dbMigration.RunCreate(ctx)

@@ -18,7 +18,7 @@ func (m ResponseLoyalty) Process(result pipeline2.Message) ([]pipeline2.Message,
 
 	err := json.Unmarshal(data.Loyalty.Response, &data.Loyalty.ResponseLoyaltyService)
 	if err != nil {
-		return []pipeline2.Message{data}, errors.New("ResponseLoyalty" + err.Error())
+		return []pipeline2.Message{data}, errors.New("ResponseLoyalty " + err.Error())
 	}
 
 	return []pipeline2.Message{data}, nil
