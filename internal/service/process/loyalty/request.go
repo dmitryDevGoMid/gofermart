@@ -47,12 +47,14 @@ func (m RequestLoyalty) Process(result pipeline2.Message) ([]pipeline2.Message, 
 		return []pipeline2.Message{data}, errors.New(errString)
 	}
 
+	fmt.Println("LOYLTY RESPONSE BODY=====>", response)
+
 	response.StatusCode()
 
 	data.Loyalty.Response = response.Body()
 
 	data.Default.Response = func() {
-		fmt.Println("LOYLTY RESPONSE BODY=====>", response)
+		//fmt.Println("LOYLTY RESPONSE BODY=====>", response)
 	}
 
 	return []pipeline2.Message{data}, nil
