@@ -2,6 +2,7 @@ package balance
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
@@ -42,7 +43,7 @@ func (m HandlerBalance) Process(result pipeline.Message) ([]pipeline.Message, er
 	//Разница
 	calcBalance := totalAccrual - totalWithdraw
 
-	data.Balance.ResponseBalance = repository.ResponseBalance{Current: calcBalance, Withdrawn: totalWithdraw}
+	data.Balance.ResponseBalance = repository.ResponseBalance{Current: math.Round(float64(calcBalance)*100) / 100, Withdrawn: math.Round(float64(totalWithdraw)*100) / 100}
 
 	return []pipeline.Message{data}, nil
 }
