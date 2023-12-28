@@ -27,6 +27,8 @@ func Run() {
 		fmt.Println("Config", err)
 	}
 
+	fmt.Println("ADDRESS_ACRUAL:", cfg.AccrualSystem.AccrualSystem)
+
 	dbConnection := db.NewConnection(cfg)
 
 	dbMigration := migration.NewMigration(dbConnection.DB(), cfg)
