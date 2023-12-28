@@ -24,7 +24,7 @@ func (m ResponseBalance) Process(result pipeline.Message) ([]pipeline.Message, e
 	}
 
 	data.Default.Response = func() {
-		data.Default.Ctx.JSON(http.StatusOK, string(dataResponse))
+		data.Default.Ctx.Data(http.StatusOK, "application/json", dataResponse)
 	}
 
 	return []pipeline.Message{data}, nil
