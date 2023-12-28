@@ -49,7 +49,8 @@ func Calculate(number string) (string, string, error) {
 
 // Generate will generate a valid luhn number of the provided length
 func Generate(length int) string {
-	rand.Seed(time.Now().UTC().UnixNano())
+	source := rand.NewSource(time.Now().UnixNano())
+	rand := rand.New(source)
 
 	var s strings.Builder
 	for i := 0; i < length-1; i++ {
