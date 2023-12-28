@@ -27,7 +27,7 @@ func (m ResponseGetListAllOrdersByAccrual) Process(result pipeline.Message) ([]p
 	}
 
 	data.Default.Response = func() {
-		data.Default.Ctx.JSON(http.StatusOK, string(dataResponse))
+		data.Default.Ctx.Data(http.StatusOK, "application/json", dataResponse)
 	}
 
 	return []pipeline.Message{data}, nil
