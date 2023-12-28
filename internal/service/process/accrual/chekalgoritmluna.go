@@ -29,7 +29,7 @@ func (m AccrualCheckAlgoritmLuna) Process(result pipeline.Message) ([]pipeline.M
 		data.Default.ResponseError = func() {
 			data.Default.Ctx.Status(422)
 		}
-		return []pipeline.Message{data}, errors.New("Invalid check number")
+		return []pipeline.Message{data}, errors.New("invalid check number")
 	}
 
 	data.Accrual.Accrual = *accrual

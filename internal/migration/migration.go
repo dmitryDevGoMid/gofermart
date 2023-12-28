@@ -241,7 +241,8 @@ func (m *migration) SetDataForTest() string {
 	insert := ""
 	for i := 0; i < 11500; i++ {
 
-		rand.Seed(time.Now().UnixNano())
+		source := rand.NewSource(time.Now().UnixNano())
+		rand := rand.New(source)
 		min := 1
 		max := 5
 		idStatus := rand.Intn(max-min+1) + min

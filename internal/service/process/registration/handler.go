@@ -19,13 +19,19 @@ func (m HandlerRegistration) Process(result pipeline.Message) ([]pipeline.Messag
 
 	user, err := data.Default.Repository.SelectUserByEmail(data.Default.Ctx.Request.Context(), &data.User.User)
 
-	fmt.Println(data.User.User)
+	if err != nil {
+		data.Default.ResponseError = func() {
+			data.Default.Ctx.Status(http.StatusBadRequest)
+		}
+		return []pipeline.Message{data}, err
+
+	}
 
 	if user != nil {
 		data.Default.ResponseError = func() {
 			data.Default.Ctx.Status(http.StatusConflict)
 		}
-		return []pipeline.Message{data}, errors.New("This login already exists")
+		return []pipeline.Message{data}, errors.New("this login already exists")
 	}
 
 	user, err = data.Default.Repository.InsertUser(data.Default.Ctx.Request.Context(), &data.User.User)

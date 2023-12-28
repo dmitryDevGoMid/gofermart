@@ -23,7 +23,7 @@ import (
 type Repository interface {
 
 	//############# UPDATE
-	UpdateAccrualById(ctx context.Context, dataAccrual *Accrual) error
+	UpdateAccrualByID(ctx context.Context, dataAccrual *Accrual) error
 
 	//############# SELECT
 	SelectWithdrawByUserSum(ctx context.Context, dataUser *User) (float32, error)
@@ -81,7 +81,7 @@ func (rep *repository) InitCatalogData(ctx context.Context) error {
 }
 
 // ################################# UPDATE ########################################
-func (rep *repository) UpdateAccrualById(ctx context.Context, dataAccrual *Accrual) error {
+func (rep *repository) UpdateAccrualByID(ctx context.Context, dataAccrual *Accrual) error {
 	sqlStatement := `UPDATE user_accrual SET accrual = $1, id_status = $2  WHERE id = $3;`
 	_, err := rep.db.Exec(ctx, sqlStatement, dataAccrual.Accrual, dataAccrual.IDStatus, dataAccrual.ID)
 
@@ -118,9 +118,7 @@ func (rep *repository) SelectWithdrawByUserSum(ctx context.Context, dataUser *Us
 
 	status := "PROCESSED"
 
-	var sumSum float32
-
-	sumSum = 0
+	var sumSum float32 = 0
 
 	sqlQuery := `SELECT coalesce(SUM(sum), 0.00) as sum_withdraw FROM user_withdraw inner join type_status on user_withdraw.ID_status = type_status.ID  
 						Where id_user = $1 and type_status.name = $2`
@@ -143,9 +141,7 @@ func (rep *repository) SelectAccrualByUserSum(ctx context.Context, dataUser *Use
 
 	status := "PROCESSED"
 
-	var sumAccrual float32
-
-	sumAccrual = 0
+	var sumAccrual float32 = 0
 
 	sqlQuery := `SELECT coalesce(SUM(accrual), 0.00) as sum_accrual FROM user_accrual inner join type_status on user_accrual.ID_status = type_status.ID
 					Where id_user = $1 and type_status.name = $2`

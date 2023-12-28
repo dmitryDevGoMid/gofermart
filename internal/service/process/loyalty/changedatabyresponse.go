@@ -18,7 +18,7 @@ func (m CahngeDataByResponseLoyalty) Process(result pipeline2.Message) ([]pipeli
 	data.Loyalty.Accrual.IDStatus = catalogData.TypeStatus[data.Loyalty.ResponseLoyaltyService.Status]
 	data.Loyalty.Accrual.Accrual = data.Loyalty.ResponseLoyaltyService.Accrual
 
-	err := data.Default.Repository.UpdateAccrualById(context.TODO(), &data.Loyalty.Accrual)
+	err := data.Default.Repository.UpdateAccrualByID(context.TODO(), &data.Loyalty.Accrual)
 
 	if err != nil {
 		return []pipeline2.Message{data}, err
