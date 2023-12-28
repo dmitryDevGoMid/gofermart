@@ -88,7 +88,8 @@ func calculateLuhnSum(number string, parity int) (int64, error) {
 
 // Generate will generate a valid luhn number of the provided length with prefix
 func GenerateWithPrefix(prefix string, length int) string {
-	rand.Seed(time.Now().UTC().UnixNano())
+	source := rand.NewSource(time.Now().UnixNano())
+	rand := rand.New(source)
 
 	var s strings.Builder
 	s.WriteString(prefix)
