@@ -42,17 +42,17 @@ func Run() {
 
 	fmt.Println(cfg.Server.Address)
 
-	//Запускаем запросы к системе лояльности
-	go loyalty.Start(ctx, cfg, repository)
-
 	//Удаляем таблицы из БД
-	//dbMigration.RunDrop(ctx)
+	dbMigration.RunDrop(ctx)
 
 	//Создаем таблицы в БД
 	dbMigration.RunCreate(ctx)
 
 	//Заполняем справочники
 	repository.InitCatalogData(ctx)
+
+	//Запускаем запросы к системе лояльности
+	go loyalty.Start(ctx, cfg, repository)
 
 	srv := &http.Server{
 		Addr:    cfg.Server.Address,

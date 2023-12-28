@@ -151,6 +151,12 @@ func (m *migration) TypeStatus() string {
 		name VARCHAR(25) NOT NULL,
 		PRIMARY KEY(id)
 	);
+	INSERT INTO type_status(name) VALUES('NEW');
+	INSERT INTO type_status(name) VALUES('PROCESSING');
+	INSERT INTO type_status(name) VALUES('INVALID');
+	INSERT INTO type_status(name) VALUES('PROCESSED');
+	INSERT INTO type_status(name) VALUES('REGISTERED');
+
 	`
 }
 
@@ -252,16 +258,7 @@ func (m *migration) SetDataForTest() string {
 		insert = insert + fmt.Sprintf("INSERT INTO user_accrual(id_user,id_order,accrual, id_status) VALUES(1,'%s',%v,%d);\n", order, accrual, idStatus)
 	}
 
-	return `
-	INSERT INTO type_status(name) VALUES('NEW');
-	INSERT INTO type_status(name) VALUES('PROCESSING');
-	INSERT INTO type_status(name) VALUES('INVALID');
-	INSERT INTO type_status(name) VALUES('PROCESSED');
-	INSERT INTO type_status(name) VALUES('REGISTERED');
-
-	INSERT INTO users(login,password) VALUES('opsegorsmall@email.ro','$2a$10$FX4hibP9D0Tw0E4EqERQ/eA7mMt5HXFg59F2lHRfS7ZEOIzvppevy');
-
-	` + insert
+	return `INSERT INTO users(login,password) VALUES('opsegorsmall@email.ro','$2a$10$FX4hibP9D0Tw0E4EqERQ/eA7mMt5HXFg59F2lHRfS7ZEOIzvppevy');` + insert
 
 	//
 }
