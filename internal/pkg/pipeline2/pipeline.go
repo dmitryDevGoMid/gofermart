@@ -99,6 +99,7 @@ func (ch *WorkersPipeline) Stop() error {
 		//Закрываем канал входных данных
 		//close(i.Input())
 		i.WaitStop()
+		//Запукаем цепную реакцию, которая закрываем все горутины во всех воркерах
 		close(i.Output())
 	}
 

@@ -15,7 +15,6 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/handlers"
 	"github.com/dmitryDevGoMid/gofermart/internal/migration"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
-	"github.com/dmitryDevGoMid/gofermart/internal/service/process/loyalty"
 	"github.com/gin-gonic/gin"
 )
 
@@ -54,7 +53,7 @@ func Run() {
 	repository.InitCatalogData(ctx)
 
 	//Запускаем запросы к системе лояльности
-	go loyalty.Start(ctx, cfg, repository)
+	//go loyalty.Start(ctx, cfg, repository)
 
 	srv := &http.Server{
 		Addr:    cfg.Server.Address,

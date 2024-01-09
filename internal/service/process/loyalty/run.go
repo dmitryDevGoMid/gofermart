@@ -63,6 +63,7 @@ func LoyaltyRun(ctx context.Context, cfg *config.Config, repository repository.R
 		log.Println(err)
 	}
 
+	//Здесь формируем отдельную область памяти для каждого начисления и отправляем в канал
 	go func() {
 		defer close(p.Input())
 

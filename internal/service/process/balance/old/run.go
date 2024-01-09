@@ -1,17 +1,16 @@
-package balance
+package old
 
 import (
 	"context"
 	"fmt"
 	"log"
 	"sync"
-	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
-	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline2"
+	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
-	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication2"
+	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,20 +20,20 @@ func BalanceRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep rep
 
 	defer sync.Unlock()
 
-	//p := pipeline.NewConcurrentPipeline()
-	p := pipeline2.NewConcurrentPipeline()
+	p := pipeline.NewConcurrentPipeline()
+
 	//Проверяем наличие токена
-	p.AddPipe(authentication2.CheckJWTToken{}, &pipeline2.PipelineOpts{
+	p.AddPipe(authentication.CheckJWTToken{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
-	p.AddPipe(HandlerBalance{}, &pipeline2.PipelineOpts{
+	/*p.AddPipe(balance.HandlerBalance{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
-	p.AddPipe(ResponseBalance{}, &pipeline2.PipelineOpts{
+	p.AddPipe(balance.ResponseBalance{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
-	})
+	})*/
 
 	if err := p.Start(); err != nil {
 		log.Println(err)
@@ -56,28 +55,38 @@ func BalanceRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep rep
 	data.Default.Repository = rep
 
 	defaultSet := &data.Default
+	//getMetrics := data.GetMetrics
 
-	//Отправялем данные в пайплайн для обработки
 	p.Input() <- data
-	//Закрываем канал там где отправляем данные
-	close(p.Input())
-
-	t1 := time.Now()
 
 	go func() {
 		defer func() {
 			//datas.err()
-			fmt.Println("End Http GetBalance:")
-			t2 := time.Now()
-			diff := t2.Sub(t1)
-			fmt.Println(diff)
-			//Отсавляю один метод на все через, который отдаем как успех так фэйл
-			defaultSet.Response()
+			fmt.Println("End of!")
 			close(defaultSet.Finished)
 		}()
+		print := "Hello Worl!"
 
-		//Ожидаем данные из канала output
-		<-p.Output()
+		for {
+			select {
+			case _, ok := <-p.Output():
+				if ok {
+					//data := data.(*service.Data)
+					//fmt.Println("=====>!", defaultSet.Metrics)
+					//defaultSet.Ctx.Status(http.StatusOK)
+					defaultSet.Response()
+					return
+				}
+			case <-p.Done():
+				fmt.Println("Close====>Output")
+				//defaultSet.Err()
+				defaultSet.ResponseError()
+				//Сбрасываем куки
+				data.Default.Ctx.SetCookie("token", "", 0, "/", "localhost", false, true)
+				fmt.Println(print)
+				return
+			}
+		}
 	}()
 
 	p.Stop()
