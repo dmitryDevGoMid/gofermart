@@ -20,7 +20,7 @@ func (m HandlerAccrual) Process(result pipeline.Message) ([]pipeline.Message, er
 	err := data.Default.Repository.SelectAccrualByIDorder(data.Default.Ctx.Request.Context(), &data.Accrual.Accrual)
 
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 
@@ -29,13 +29,13 @@ func (m HandlerAccrual) Process(result pipeline.Message) ([]pipeline.Message, er
 
 	if data.Accrual.Accrual.ID != 0 {
 		if data.Accrual.Accrual.IDUser != data.User.User.ID {
-			data.Default.ResponseError = func() {
+			data.Default.Response = func() {
 				data.Default.Ctx.Status(409)
 			}
 
 			return []pipeline.Message{data}, errors.New("invalid accrual upload another uers")
 		} else {
-			data.Default.ResponseError = func() {
+			data.Default.Response = func() {
 				data.Default.Ctx.Status(http.StatusOK)
 			}
 

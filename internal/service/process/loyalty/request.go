@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline2"
+	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/go-resty/resty/v2"
 )
@@ -13,7 +13,7 @@ import (
 type RequestLoyalty struct{}
 
 // Обрабатываем поступивший
-func (m RequestLoyalty) Process(result pipeline2.Message) ([]pipeline2.Message, error) {
+func (m RequestLoyalty) Process(result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
 	client := resty.New()
@@ -32,7 +32,7 @@ func (m RequestLoyalty) Process(result pipeline2.Message) ([]pipeline2.Message, 
 	switch response.StatusCode() {
 	case 500, 204:
 		errString := fmt.Sprintf(`loyalty response %d`, response.StatusCode())
-		return []pipeline2.Message{data}, errors.New(errString)
+		return []pipeline.Message{data}, errors.New(errString)
 	case 429:
 		retryTimeSecond := response.Header().Get("Retry-After")
 		timeTicker, err := strconv.Atoi(retryTimeSecond)
@@ -44,7 +44,7 @@ func (m RequestLoyalty) Process(result pipeline2.Message) ([]pipeline2.Message, 
 			data.Default.Cfg.TickerTime.TickTack = timeTicker
 		}
 		errString := fmt.Sprintf(`loyalty response %d`, response.StatusCode())
-		return []pipeline2.Message{data}, errors.New(errString)
+		return []pipeline.Message{data}, errors.New(errString)
 	}
 
 	fmt.Println("LOYLTY RESPONSE BODY=====>", response)
@@ -57,5 +57,5 @@ func (m RequestLoyalty) Process(result pipeline2.Message) ([]pipeline2.Message, 
 		//fmt.Println("LOYLTY RESPONSE BODY=====>", response)
 	}
 
-	return []pipeline2.Message{data}, nil
+	return []pipeline.Message{data}, nil
 }

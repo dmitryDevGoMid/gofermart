@@ -40,8 +40,8 @@ func (ch *WorkersPipeline) AddPipe(pipe StagePipe, opt *PipelineOpts) {
 	}
 
 	//Создаем каналы для входных и выходных данных
-	var input = make(chan Message, 10)
-	var output = make(chan Message, 10)
+	var input = make(chan Message)
+	var output = make(chan Message)
 
 	//Определяем, что входным каналом будет выходной канал ранее созданного pipe
 	for _, i := range ch.workers {
@@ -99,12 +99,15 @@ func (ch *WorkersPipeline) Stop() error {
 		//Закрываем канал входных данных
 		//close(i.Input())
 		i.WaitStop()
-		close(i.Input())
+		//Запукаем цепную реакцию, которая закрываем все горутины во всех воркерах
+		close(i.Output())
 	}
 
 	//Закрвыаем выходной канал у последнего pipe
-	sz := len(ch.workers)
-	close(ch.workers[sz-1].Output())
+	//sz := len(ch.workers)
+	//close(ch.workers[sz-1].Output())
+	//close(ch.Done())
+
 	return nil
 }
 

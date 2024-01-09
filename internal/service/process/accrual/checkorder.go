@@ -24,7 +24,7 @@ func (m HandlerAccrualCheckOrder) Process(result pipeline.Message) ([]pipeline.M
 
 	//Инициализируем ошибку для ответа клиенту
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 

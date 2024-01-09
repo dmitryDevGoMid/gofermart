@@ -3,14 +3,14 @@ package loyalty
 import (
 	"context"
 
-	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline2"
+	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 )
 
 type CahngeDataByResponseLoyalty struct{}
 
 // Обрабатываем поступивший
-func (m CahngeDataByResponseLoyalty) Process(result pipeline2.Message) ([]pipeline2.Message, error) {
+func (m CahngeDataByResponseLoyalty) Process(result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
 	catalogData := data.Default.Repository.GetCatalogData(context.TODO())
@@ -21,8 +21,8 @@ func (m CahngeDataByResponseLoyalty) Process(result pipeline2.Message) ([]pipeli
 	err := data.Default.Repository.UpdateAccrualByID(context.TODO(), &data.Loyalty.Accrual)
 
 	if err != nil {
-		return []pipeline2.Message{data}, err
+		return []pipeline.Message{data}, err
 	}
 
-	return []pipeline2.Message{data}, nil
+	return []pipeline.Message{data}, nil
 }

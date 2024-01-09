@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
@@ -55,34 +56,26 @@ func GetAllListWithdrawalsRun(ctx context.Context, c *gin.Context, cfg *config.C
 
 	defaultSet := &data.Default
 
+	//Отправялем данные в пайплайн для обработки
 	p.Input() <- data
+	//Закрываем канал там где отправляем данные
+	close(p.Input())
+
+	t1 := time.Now()
 
 	go func() {
 		defer func() {
-			//datas.err()
-			fmt.Println("End of!")
+			t2 := time.Now()
+			diff := t2.Sub(t1)
+			//Выводим время затраченное на выполнение процесса
+			fmt.Println("End Http GetListAllWithDrawals:", diff)
+			//Отсавляю один метод на все через, который отдаем как успех так фэйл
+			defaultSet.Response()
 			close(defaultSet.Finished)
 		}()
-		print := "Hello Worl!"
 
-		for {
-			select {
-			case _, ok := <-p.Output():
-				if ok {
-					//data := data.(*service.Data)
-					//fmt.Println("=====>!", defaultSet.Metrics)
-					//defaultSet.Ctx.Status(http.StatusOK)
-					defaultSet.Response()
-					return
-				}
-			case <-p.Done():
-				fmt.Println("Close====>Output")
-				//defaultSet.Err()
-				defaultSet.ResponseError()
-				fmt.Println(print)
-				return
-			}
-		}
+		//Ожидаем данные из канала output
+		<-p.Output()
 	}()
 
 	p.Stop()

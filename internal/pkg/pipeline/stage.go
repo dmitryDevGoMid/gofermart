@@ -19,37 +19,25 @@ type StageWorker struct {
 // Воркеры для каждого pipe свои кол-во определяется в PipelineOpts{maxWorkers}
 func (chb *StageWorker) Start(done chan struct{}) error {
 	for i := 0; i < chb.maxWorkers; i++ {
-		//Увеличиваем группу синхронизации на 1
+		//Увеличиваем группу синхронизации на 1 - в данной реализации pipe&workpool в этом нет необходимости
 		chb.wg.Add(1)
 		// Запускаем в горотине метод по обработке данных, который реализует итерфейс StagePipe{Process(step Message) ([]Message, error)}
 		go func() {
-			//Уменьшаем группу синхронизации на 1
 			defer func() {
-				fmt.Println("Close DONE")
+				fmt.Println("Close gorutines...")
 				chb.wg.Done()
+				//Закрываем входящий канал для следующего pipe - данных больше не будет! (цепная реакция, которая закроет все горутины)
+				//close(chb.Output())
 			}()
 
-			for {
-				select {
-				// Ожидаем данные поступившие на вход (input)
-				case runProcess, ok := <-chb.Input():
-					if ok {
-						//Запускаем обработку данных передав в  StagePipe{Process()} данные поступившие на вход (input)
-						result, err := chb.pipe.Process(runProcess)
-						if err != nil {
-							log.Println(err)
-							close(done)
-							return
-						}
-						for _, r := range result {
-							chb.Output() <- r
-						}
-						//Выполнили задачу и вывалились из горутины
-						return
-					}
-				case <-done:
-					fmt.Println("close channel out gorutine")
-					return
+			for runProcess := range chb.Input() {
+				result, err := chb.pipe.Process(runProcess)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				for _, r := range result {
+					chb.Output() <- r
 				}
 			}
 		}()

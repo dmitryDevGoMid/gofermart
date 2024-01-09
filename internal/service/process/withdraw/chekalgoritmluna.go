@@ -21,7 +21,7 @@ func (m WithDrawCheckAlgoritmLuna) Process(result pipeline.Message) ([]pipeline.
 
 	//Проверяем номер на валидность
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(422)
 		}
 		return []pipeline.Message{data}, errors.New("invalid check order number withdraw")

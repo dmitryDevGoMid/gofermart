@@ -19,7 +19,7 @@ func (m OrderCRUDAccrual) Process(result pipeline.Message) ([]pipeline.Message, 
 	err := data.Default.Repository.InsertAccrual(data.Default.Ctx.Request.Context(), &data.Accrual.Accrual)
 
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.JSON(http.StatusBadRequest, gin.H{
 				"code":    http.StatusBadRequest,
 				"message": string("Trable InsertAccrual"), // cast it to string before showing

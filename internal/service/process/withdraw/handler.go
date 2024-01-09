@@ -21,7 +21,7 @@ func (m HandlerWithdraw) Process(result pipeline.Message) ([]pipeline.Message, e
 	totalWithdraw, err := data.Default.Repository.SelectWithdrawByUserSum(data.Default.Ctx.Request.Context(), &data.User.User)
 	fmt.Println(totalWithdraw)
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 
@@ -32,7 +32,7 @@ func (m HandlerWithdraw) Process(result pipeline.Message) ([]pipeline.Message, e
 	totalAccrual, err := data.Default.Repository.SelectAccrualByUserSum(data.Default.Ctx.Request.Context(), &data.User.User)
 	fmt.Println(totalAccrual)
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 
@@ -45,7 +45,7 @@ func (m HandlerWithdraw) Process(result pipeline.Message) ([]pipeline.Message, e
 	fmt.Println("Списание:", data.Withdraw.Withdraw.Sum)
 	//Сравниваем остаток и сумму списания по заказу
 	if calcTotal < data.Withdraw.Withdraw.Sum {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(402)
 		}
 

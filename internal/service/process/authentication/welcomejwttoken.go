@@ -18,7 +18,7 @@ func (chain CheckJWTToken) Process(result pipeline.Message) ([]pipeline.Message,
 
 	cookies, err := data.Default.Ctx.Cookie("token")
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusUnauthorized)
 		}
 		return []pipeline.Message{data}, err
@@ -40,19 +40,19 @@ func (chain CheckJWTToken) Process(result pipeline.Message) ([]pipeline.Message,
 		return jwtKey, nil
 	})
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusUnauthorized)
 		}
 	}
 	if tkn != nil {
 		if !tkn.Valid {
-			data.Default.ResponseError = func() {
+			data.Default.Response = func() {
 				data.Default.Ctx.Status(http.StatusUnauthorized)
 			}
 			return []pipeline.Message{data}, err
 		}
 	} else {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusUnauthorized)
 		}
 		return []pipeline.Message{data}, err

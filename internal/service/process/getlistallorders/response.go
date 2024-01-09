@@ -20,7 +20,7 @@ func (m ResponseGetListAllOrdersByAccrual) Process(result pipeline.Message) ([]p
 	fmt.Println(dataResponse)
 
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 		return []pipeline.Message{data}, nil

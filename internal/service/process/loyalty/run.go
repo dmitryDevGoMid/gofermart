@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
-	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline2"
+	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 )
@@ -42,20 +42,20 @@ func LoyaltyRun(ctx context.Context, cfg *config.Config, repository repository.R
 		return err
 	}
 
-	p := pipeline2.NewConcurrentPipeline()
+	p := pipeline.NewConcurrentPipeline()
 
 	//Отправляем данные в потоке в лояльность
-	p.AddPipe(RequestLoyalty{}, &pipeline2.PipelineOpts{
+	p.AddPipe(RequestLoyalty{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
 	//Обрабатываем ответ
-	p.AddPipe(ResponseLoyalty{}, &pipeline2.PipelineOpts{
+	p.AddPipe(ResponseLoyalty{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
 	//Изменяем данные
-	p.AddPipe(CahngeDataByResponseLoyalty{}, &pipeline2.PipelineOpts{
+	p.AddPipe(CahngeDataByResponseLoyalty{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 

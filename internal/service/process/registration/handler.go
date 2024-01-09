@@ -20,7 +20,7 @@ func (m HandlerRegistration) Process(result pipeline.Message) ([]pipeline.Messag
 	user, err := data.Default.Repository.SelectUserByEmail(data.Default.Ctx.Request.Context(), &data.User.User)
 
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 		return []pipeline.Message{data}, err
@@ -28,7 +28,7 @@ func (m HandlerRegistration) Process(result pipeline.Message) ([]pipeline.Messag
 	}
 
 	if user != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusConflict)
 		}
 		return []pipeline.Message{data}, errors.New("this login already exists")
@@ -38,7 +38,7 @@ func (m HandlerRegistration) Process(result pipeline.Message) ([]pipeline.Messag
 
 	//Инициализируем ошибку для ответа клиенту
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 		return []pipeline.Message{data}, err

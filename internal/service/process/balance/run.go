@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
-	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline2"
+	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
-	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication2"
+	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,17 +22,17 @@ func BalanceRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep rep
 	defer sync.Unlock()
 
 	//p := pipeline.NewConcurrentPipeline()
-	p := pipeline2.NewConcurrentPipeline()
+	p := pipeline.NewConcurrentPipeline()
 	//Проверяем наличие токена
-	p.AddPipe(authentication2.CheckJWTToken{}, &pipeline2.PipelineOpts{
+	p.AddPipe(authentication.CheckJWTToken{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
-	p.AddPipe(HandlerBalance{}, &pipeline2.PipelineOpts{
+	p.AddPipe(HandlerBalance{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
-	p.AddPipe(ResponseBalance{}, &pipeline2.PipelineOpts{
+	p.AddPipe(ResponseBalance{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
@@ -66,11 +66,10 @@ func BalanceRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep rep
 
 	go func() {
 		defer func() {
-			//datas.err()
-			fmt.Println("End Http GetBalance:")
 			t2 := time.Now()
 			diff := t2.Sub(t1)
-			fmt.Println(diff)
+			//Выводим время затраченное на выполнение процесса
+			fmt.Println("End Http GetBalance:", diff)
 			//Отсавляю один метод на все через, который отдаем как успех так фэйл
 			defaultSet.Response()
 			close(defaultSet.Finished)

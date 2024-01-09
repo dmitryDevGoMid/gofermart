@@ -23,7 +23,7 @@ func (chain UnserializeUser) Process(result pipeline.Message) ([]pipeline.Messag
 	err := json.Unmarshal(data.Default.Body, &user)
 
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 		return []pipeline.Message{data}, err
@@ -46,7 +46,7 @@ func (chain UnserializeLogin) Process(result pipeline.Message) ([]pipeline.Messa
 	err := json.Unmarshal(data.Default.Body, &user)
 
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 		return []pipeline.Message{data}, err
@@ -69,7 +69,7 @@ func (chain UnserializeWithdraw) Process(result pipeline.Message) ([]pipeline.Me
 	err := json.Unmarshal(data.Default.Body, &withdraw)
 
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 		return []pipeline.Message{data}, err

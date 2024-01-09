@@ -22,7 +22,7 @@ func (m HandlerGetListAllOrdersByAccrual) Process(result pipeline.Message) ([]pi
 	fmt.Println(listOrders)
 
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 
@@ -30,7 +30,7 @@ func (m HandlerGetListAllOrdersByAccrual) Process(result pipeline.Message) ([]pi
 	}
 
 	if len(listOrders) == 0 {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(204)
 		}
 		return []pipeline.Message{data}, errors.New("empty data response list accrual")

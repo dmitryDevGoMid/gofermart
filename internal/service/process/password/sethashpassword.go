@@ -21,7 +21,7 @@ func (m SetHashPassword) Process(result pipeline.Message) ([]pipeline.Message, e
 
 	//Инициализируем ошибку для ответа клиенту
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 		return []pipeline.Message{data}, err

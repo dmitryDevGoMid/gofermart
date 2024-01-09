@@ -26,7 +26,7 @@ func (m AccrualCheckAlgoritmLuna) Process(result pipeline.Message) ([]pipeline.M
 
 	//Проверяем номер на валидность
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(422)
 		}
 		return []pipeline.Message{data}, errors.New("invalid check number")

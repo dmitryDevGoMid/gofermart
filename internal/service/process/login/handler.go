@@ -18,7 +18,7 @@ func (m HandlerLogin) Process(result pipeline.Message) ([]pipeline.Message, erro
 
 	//Инициализируем ошибку для ответа клиенту
 	if err != nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
 		}
 
@@ -26,7 +26,7 @@ func (m HandlerLogin) Process(result pipeline.Message) ([]pipeline.Message, erro
 	}
 
 	if user == nil {
-		data.Default.ResponseError = func() {
+		data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusUnauthorized)
 		}
 
