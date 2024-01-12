@@ -3,7 +3,6 @@ package loyalty
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
@@ -60,7 +59,7 @@ func LoyaltyRun(ctx context.Context, cfg *config.Config, repository repository.R
 	})
 
 	if err := p.Start(); err != nil {
-		log.Println(err)
+		return err
 	}
 
 	//Здесь формируем отдельную область памяти для каждого начисления и отправляем в канал

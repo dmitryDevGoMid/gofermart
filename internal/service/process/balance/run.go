@@ -3,7 +3,6 @@ package balance
 import (
 	"context"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -16,10 +15,6 @@ import (
 )
 
 func BalanceRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
-
-	sync.Lock()
-
-	defer sync.Unlock()
 
 	//p := pipeline.NewConcurrentPipeline()
 	p := pipeline.NewConcurrentPipeline()
@@ -37,7 +32,7 @@ func BalanceRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep rep
 	})
 
 	if err := p.Start(); err != nil {
-		log.Println(err)
+		return err
 	}
 
 	data := &service.Data{}

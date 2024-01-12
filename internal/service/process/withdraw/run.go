@@ -3,7 +3,6 @@ package withdraw
 import (
 	"context"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -17,10 +16,6 @@ import (
 )
 
 func WithdrawRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
-
-	sync.Lock()
-
-	defer sync.Unlock()
 
 	p := pipeline.NewConcurrentPipeline()
 
@@ -54,7 +49,7 @@ func WithdrawRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep re
 	})
 
 	if err := p.Start(); err != nil {
-		log.Println(err)
+		return err
 	}
 
 	data := &service.Data{}

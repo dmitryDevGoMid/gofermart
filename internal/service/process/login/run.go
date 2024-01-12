@@ -3,7 +3,6 @@ package login
 import (
 	"context"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -50,7 +49,7 @@ func LoginRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repos
 	})
 
 	if err := p.Start(); err != nil {
-		log.Println(err)
+		return err
 	}
 
 	data := &service.Data{}

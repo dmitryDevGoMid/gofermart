@@ -3,7 +3,6 @@ package getlistallwithdrawals
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
@@ -36,7 +35,7 @@ func GetAllListWithdrawalsRun(ctx context.Context, c *gin.Context, cfg *config.C
 	})
 
 	if err := p.Start(); err != nil {
-		log.Println(err)
+		return err
 	}
 
 	data := &service.Data{}
