@@ -8,6 +8,7 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
+	"github.com/opentracing/opentracing-go"
 )
 
 type HandlerBalance struct{}
@@ -18,8 +19,11 @@ func (m HandlerBalance) Process(result pipeline.Message) ([]pipeline.Message, er
 
 	data := result.(*service.Data)
 
+	span, ctx := opentracing.StartSpanFromContext(*data.Default.TraceCtx, "Service.Process.GetBalance")
+	defer span.Finish()
+
 	//Сумма списаний
-	totalWithdraw, err := data.Default.Repository.SelectWithdrawByUserSum(data.Default.Ctx.Request.Context(), &data.User.User)
+	totalWithdraw, err := data.Default.Repository.SelectWithdrawByUserSum(ctx, &data.User.User)
 	fmt.Println(totalWithdraw)
 	if err != nil {
 
@@ -31,7 +35,7 @@ func (m HandlerBalance) Process(result pipeline.Message) ([]pipeline.Message, er
 	}
 
 	//Сумма начислений
-	totalAccrual, err := data.Default.Repository.SelectAccrualByUserSum(data.Default.Ctx.Request.Context(), &data.User.User)
+	totalAccrual, err := data.Default.Repository.SelectAccrualByUserSum(ctx, &data.User.User)
 	fmt.Println(totalAccrual)
 	if err != nil {
 

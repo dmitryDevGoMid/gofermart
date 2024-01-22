@@ -1,21 +1,20 @@
 package accrual
 
 import (
-	"context"
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
-	"github.com/dmitryDevGoMid/gofermart/internal/config"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
-	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
-	"github.com/gin-gonic/gin"
 )
 
-func AccrualRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
+// func AccrualRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
+// func AccrualRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
+func AccrualRun(dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
 
 	sync.Lock()
 
@@ -55,25 +54,17 @@ func AccrualRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep rep
 	})
 
 	if err := p.Start(); err != nil {
-		return err
+		log.Println(err)
 	}
 
-	data := &service.Data{}
-
-	//Устанавливаем контекст запроса gin
-	data.Default.Ctx = c
-	//Устанавливаем конфигурационные данные
-	data.Default.Cfg = cfg
-	//Устанавливаем канал завершения процесса
-	data.Default.Finished = finished
-	//Устанавливаем репозитарий для данных из базы
-	data.Default.Repository = rep
+	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
 	//getMetrics := data.GetMetrics
 
 	//Отправялем данные в пайплайн для обработки
 	p.Input() <- data
+
 	//Закрываем канал там где отправляем данные
 	close(p.Input())
 
@@ -95,5 +86,6 @@ func AccrualRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep rep
 	}()
 
 	p.Stop()
-	return nil
+
+	return defaultSet.Finished, nil
 }

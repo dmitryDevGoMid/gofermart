@@ -1,22 +1,19 @@
 package login
 
 import (
-	"context"
 	"fmt"
 	"sync"
 	"time"
 
-	"github.com/dmitryDevGoMid/gofermart/internal/config"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
-	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/password"
-	"github.com/gin-gonic/gin"
 )
 
-func LoginRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
+// func LoginRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
+func LoginRun(dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
 
 	sync.Lock()
 
@@ -49,19 +46,10 @@ func LoginRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repos
 	})
 
 	if err := p.Start(); err != nil {
-		return err
+		return nil, err
 	}
 
-	data := &service.Data{}
-
-	//Устанавливаем контекст запроса gin
-	data.Default.Ctx = c
-	//Устанавливаем конфигурационные данные
-	data.Default.Cfg = cfg
-	//Устанавливаем канал завершения процесса
-	data.Default.Finished = finished
-	//Устанавливаем репозитарий для данных из базы
-	data.Default.Repository = rep
+	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
 	//getMetrics := data.GetMetrics
@@ -75,11 +63,10 @@ func LoginRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repos
 
 	go func() {
 		defer func() {
-			//datas.err()
-			fmt.Println("End Http Login:")
 			t2 := time.Now()
 			diff := t2.Sub(t1)
-			fmt.Println(diff)
+			//Выводим время затраченное на выполнение процесса
+			fmt.Println("End Http Login:", diff)
 			//Отсавляю один метод на все через, который отдаем как успех так фэйл
 			defaultSet.Response()
 			close(defaultSet.Finished)
@@ -91,5 +78,5 @@ func LoginRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repos
 
 	p.Stop()
 
-	return nil
+	return defaultSet.Finished, nil
 }

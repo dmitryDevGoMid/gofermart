@@ -1,19 +1,15 @@
 package registration
 
 import (
-	"context"
 	"fmt"
-	"sync"
 	"time"
 
-	"github.com/dmitryDevGoMid/gofermart/internal/config"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/password"
-	"github.com/gin-gonic/gin"
 )
 
 type User struct {
@@ -24,7 +20,8 @@ type User struct {
 
 //Запускаем pipeline для процесса регистрации клиента в сервисе
 
-func RegistrationRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
+// func RegistrationRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
+func RegistrationRun(dataService *service.Data) (chan struct{}, error) {
 
 	p := pipeline.NewConcurrentPipeline()
 
@@ -53,19 +50,11 @@ func RegistrationRun(ctx context.Context, c *gin.Context, cfg *config.Config, re
 	})
 
 	if err := p.Start(); err != nil {
-		return err
+		return nil, err
 	}
 
-	data := &service.Data{}
-
-	//Устанавливаем контекст запроса gin
-	data.Default.Ctx = c
-	//Устанавливаем конфигурационные данные
-	data.Default.Cfg = cfg
-	//Устанавливаем канал завершения процесса
-	data.Default.Finished = finished
-	//Устанавливаем репозитарий для данных из базы
-	data.Default.Repository = rep
+	//Получаем структуру данных для работы pipeline
+	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
 
@@ -82,8 +71,11 @@ func RegistrationRun(ctx context.Context, c *gin.Context, cfg *config.Config, re
 			diff := t2.Sub(t1)
 			//Выводим время затраченное на выполнение процесса
 			fmt.Println("End Http Registered:", diff)
-			//Отсавляю один метод на все через, который отдаем как успех так фэйл
+
+			//Отсавляю один метод на все, через который отдаем как успех так фэйл ()
 			defaultSet.Response()
+
+			// Закрываем канал с пустой структурой сигнал, о завершении выполнения pipeline
 			close(defaultSet.Finished)
 		}()
 
@@ -91,7 +83,8 @@ func RegistrationRun(ctx context.Context, c *gin.Context, cfg *config.Config, re
 		<-p.Output()
 	}()
 
+	//
 	p.Stop()
 
-	return nil
+	return defaultSet.Finished, nil
 }

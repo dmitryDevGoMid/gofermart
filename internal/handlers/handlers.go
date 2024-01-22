@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
+	"net/http"
 	"sync"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
+	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/accrual"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/balance"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/getlistallorders"
@@ -15,83 +16,160 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/registration"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/withdraw"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-client-go"
 )
 
-func NewHandlers(ctx context.Context, r *gin.Engine, cfg *config.Config, repository repository.Repository) {
+var syncLogin, syncOrdersAccrual, syncWithDraw sync.Mutex
+
+type GoferHandler interface {
+	Register(c *gin.Context)
+	Login(c *gin.Context)
+	OrdersPost(c *gin.Context)
+	OrdersGet(c *gin.Context)
+	Balance(c *gin.Context)
+	BalanceWithDraw(c *gin.Context)
+	WithDrawals(c *gin.Context)
+}
+
+type goferHandler struct {
+	cfg        *config.Config
+	repository repository.Repository
+}
+
+func NewGoferHandler(cfg *config.Config, repository repository.Repository) GoferHandler {
+	return &goferHandler{
+		cfg:        cfg,
+		repository: repository,
+	}
+}
+
+func SetHandlers(r *gin.Engine, gh GoferHandler) {
 
 	api := r.Group("/api/user")
 	{
-		api.POST("/register/", func(c *gin.Context) {
+		api.POST("/register/", gh.Register)
 
-			var sync sync.Mutex
+		api.POST("/login/", gh.Login)
 
-			finished := make(chan struct{})
+		api.POST("/orders/", gh.OrdersPost)
 
-			registration.RegistrationRun(ctx, c, cfg, repository, finished, &sync)
+		api.GET("/orders/", gh.OrdersGet)
 
-			<-finished
-			fmt.Println("STOP REGISTER!")
-		})
-		api.POST("/login/", func(c *gin.Context) {
+		api.GET("/balance/", gh.Balance)
 
-			var sync sync.Mutex
+		api.POST("/balance/withdraw/", gh.BalanceWithDraw)
 
-			finished := make(chan struct{})
-
-			login.LoginRun(ctx, c, cfg, repository, finished, &sync)
-
-			<-finished
-			fmt.Println("STOP LOGIN!")
-		})
-		api.POST("/orders/", func(c *gin.Context) {
-
-			var sync sync.Mutex
-
-			finished := make(chan struct{})
-
-			accrual.AccrualRun(ctx, c, cfg, repository, finished, &sync)
-
-			<-finished
-			fmt.Println("STOP ADD ORDERS!")
-		})
-		api.GET("/orders/", func(c *gin.Context) {
-
-			finished := make(chan struct{})
-
-			getlistallorders.GetAllListOrtdersRun(ctx, c, cfg, repository, finished)
-
-			<-finished
-			fmt.Println("STOP LIST ORDERS!")
-		})
-		api.GET("/balance/", func(c *gin.Context) {
-			var sync sync.Mutex
-
-			finished := make(chan struct{})
-
-			balance.BalanceRun(ctx, c, cfg, repository, finished, &sync)
-
-			<-finished
-			fmt.Println("STOP GET BALANCE!")
-		})
-		api.POST("/balance/withdraw/", func(c *gin.Context) {
-
-			var sync sync.Mutex
-
-			finished := make(chan struct{})
-
-			withdraw.WithdrawRun(ctx, c, cfg, repository, finished, &sync)
-
-			<-finished
-			fmt.Println("STOP ADD WITHDRAW!")
-			// Handle request for version 2 of users route
-		})
-		api.GET("/withdrawals/", func(c *gin.Context) {
-			finished := make(chan struct{})
-
-			getlistallwithdrawals.GetAllListWithdrawalsRun(ctx, c, cfg, repository, finished)
-
-			<-finished
-			fmt.Println("STOP GET withdrawals!")
-		})
+		api.GET("/withdrawals/", gh.WithDrawals)
 	}
+}
+
+func (gh *goferHandler) Register(c *gin.Context) {
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+
+	finished, err := registration.RegistrationRun(dataService)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.Status(http.StatusBadRequest)
+	}
+	<-finished
+	fmt.Println("STOP REGISTER!")
+}
+
+func (gh *goferHandler) Login(c *gin.Context) {
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+
+	finished, err := login.LoginRun(dataService, &syncLogin)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.Status(http.StatusBadRequest)
+	}
+
+	<-finished
+	fmt.Println("STOP LOGIN!")
+}
+
+func (gh *goferHandler) OrdersPost(c *gin.Context) {
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+
+	finished, err := accrual.AccrualRun(dataService, &syncOrdersAccrual)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.Status(http.StatusBadRequest)
+	}
+
+	<-finished
+	fmt.Println("STOP ADD ORDERS!")
+}
+
+func (gh *goferHandler) OrdersGet(c *gin.Context) {
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+
+	finished, err := getlistallorders.GetAllListOrtdersRun(dataService)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.Status(http.StatusBadRequest)
+	}
+
+	<-finished
+	fmt.Println("STOP LIST ORDERS!")
+}
+
+func (gh *goferHandler) Balance(c *gin.Context) {
+	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.Balance")
+	span.SetOperationName("Handler.Mandler.Balance")
+	/*span_ := opentracing.SpanFromContext(ctx)
+	if span == nil {
+		fmt.Println("EMPTY!")
+	}*/
+
+	//Получаем TraceID
+	if sc, ok := span.Context().(jaeger.SpanContext); ok {
+		fmt.Println("EMPTY!", sc.TraceID())
+		fmt.Println("EMPTY!", sc.SpanID())
+	}
+	defer span.Finish()
+
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+
+	finished, err := balance.BalanceRun(ctx, dataService)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.Status(http.StatusBadRequest)
+	}
+
+	<-finished
+	fmt.Println("STOP GET BALANCE!")
+}
+
+func (gh *goferHandler) BalanceWithDraw(c *gin.Context) {
+
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+
+	finished, err := withdraw.WithdrawRun(dataService, &syncWithDraw)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		c.Status(http.StatusBadRequest)
+	}
+
+	<-finished
+	fmt.Println("STOP ADD WITHDRAW!")
+	// Handle request for version 2 of users route
+}
+
+func (gh *goferHandler) WithDrawals(c *gin.Context) {
+
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+
+	finished, err := getlistallwithdrawals.GetAllListWithdrawalsRun(dataService)
+
+	if err != nil {
+		fmt.Println(err.Error())
+		c.Status(http.StatusBadRequest)
+	}
+
+	<-finished
+	fmt.Println("STOP ADD WITHDRAW!")
+	// Handle request for version 2 of users route
 }

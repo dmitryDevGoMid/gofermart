@@ -17,6 +17,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/opentracing/opentracing-go"
 )
 
 type Repository interface {
@@ -114,6 +115,8 @@ func (rep *repository) SelectUserByEmail(ctx context.Context, dataUser *User) (*
 
 // Получаем список всех начислений клиента по UserId
 func (rep *repository) SelectWithdrawByUserSum(ctx context.Context, dataUser *User) (float32, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectWithdrawByUserSum")
+	defer span.Finish()
 
 	status := "PROCESSED"
 
@@ -137,6 +140,8 @@ func (rep *repository) SelectWithdrawByUserSum(ctx context.Context, dataUser *Us
 
 // Получаем список всех начислений клиента по UserId
 func (rep *repository) SelectAccrualByUserSum(ctx context.Context, dataUser *User) (float32, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectAccrualByUserSum")
+	defer span.Finish()
 
 	status := "PROCESSED"
 

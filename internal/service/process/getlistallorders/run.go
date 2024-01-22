@@ -1,22 +1,20 @@
 package getlistallorders
 
 import (
-	"context"
 	"fmt"
+	"log"
 	"time"
 
-	"github.com/dmitryDevGoMid/gofermart/internal/config"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
-	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
-	"github.com/gin-gonic/gin"
 )
 
 //Запускаем pipeline для процесса регистрации клиента в сервисе
 
-func GetAllListOrtdersRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
+// func GetAllListOrtdersRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
 
+func GetAllListOrtdersRun(dataService *service.Data) (chan struct{}, error) {
 	p := pipeline.NewConcurrentPipeline()
 
 	//Проверяем наличие токена
@@ -35,25 +33,13 @@ func GetAllListOrtdersRun(ctx context.Context, c *gin.Context, cfg *config.Confi
 	})
 
 	if err := p.Start(); err != nil {
-		return err
+		log.Println(err)
 	}
 
-	data := &service.Data{}
-
-	//Устанавливаем контекст запроса gin
-	data.Default.Ctx = c
-
-	//Устанавливаем конфигурационные данные
-	data.Default.Cfg = cfg
-	data.Default.Ctx.Writer.Header().Set("Content-Type", "application/json")
-
-	//Устанавливаем канал завершения процесса
-	data.Default.Finished = finished
-
-	//Устанавливаем репозитарий для данных из базы
-	data.Default.Repository = rep
+	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
+	data.Default.Ctx.Writer.Header().Set("Content-Type", "application/json")
 
 	//Отправялем данные в пайплайн для обработки
 	p.Input() <- data
@@ -67,7 +53,6 @@ func GetAllListOrtdersRun(ctx context.Context, c *gin.Context, cfg *config.Confi
 			t2 := time.Now()
 			diff := t2.Sub(t1)
 			//Выводим время затраченное на выполнение процесса
-			fmt.Println("\n ")
 			fmt.Println("End Http GeyListAllOrders:", diff)
 			//Отсавляю один метод на все через, который отдаем как успех так фэйл
 			defaultSet.Response()
@@ -80,5 +65,5 @@ func GetAllListOrtdersRun(ctx context.Context, c *gin.Context, cfg *config.Confi
 
 	p.Stop()
 
-	return nil
+	return defaultSet.Finished, nil
 }

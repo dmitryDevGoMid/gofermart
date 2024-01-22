@@ -1,0 +1,21 @@
+AppVersion: 1.0.0
+
+Logger:
+DisableCaller: false
+DisableStacktrace: false
+Encoding: json
+Level: info
+
+Server:
+  Port: :5555
+  Development: true
+  Timeout: 15
+  ReadTimeout: 5
+  WriteTimeout: 5
+  MaxConnectionIdle: 5
+  MaxConnectionAge: 5
+
+Jaeger:
+  Host: localhost:6831
+  ServiceName: user_microservice
+  LogSpans: false

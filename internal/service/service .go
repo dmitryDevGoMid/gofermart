@@ -6,12 +6,16 @@
 package service
 
 import (
+	"context"
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/gin-gonic/gin"
 )
+
+type iData struct {
+}
 
 type Data struct {
 	Default        Default
@@ -23,6 +27,38 @@ type Data struct {
 	User           User
 	Claims         Claims
 	Loyalty        Loyalty
+}
+
+func (current *Data) GetNewService() *Data {
+	data := &Data{}
+
+	//Устанавливаем новый канал для стека данных
+	finished := make(chan struct{})
+
+	// Устанавливаем контекст запроса gin
+	data.Default.Ctx = current.Default.Ctx
+	// Устанавливаем конфигурационные данные
+	data.Default.Cfg = current.Default.Cfg
+	// Устанавливаем канал завершения процесса
+	data.Default.Finished = finished
+	// Устанавливаем репозитарий для данных из базы
+	data.Default.Repository = current.Default.Repository
+
+	return data
+}
+
+func SetServiceData(c *gin.Context, cfg *config.Config, rep repository.Repository) *Data {
+	//func SetServiceData(c context.Context, cfg *config.Config, rep repository.Repository) *Data {
+	data := &Data{}
+
+	// Устанавливаем контекст запроса gin
+	data.Default.Ctx = c
+	// Устанавливаем конфигурационные данные
+	data.Default.Cfg = cfg
+	// Устанавливаем репозитарий для данных из базы
+	data.Default.Repository = rep
+
+	return data
 }
 
 type Accrual struct {
@@ -68,6 +104,7 @@ type Default struct {
 	ResponseError func()
 	Finished      chan struct{}
 	Body          []byte
+	TraceCtx      *context.Context
 }
 
 type Loyalty struct {

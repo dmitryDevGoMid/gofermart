@@ -1,22 +1,19 @@
 package getlistallwithdrawals
 
 import (
-	"context"
 	"fmt"
+	"log"
 	"time"
 
-	"github.com/dmitryDevGoMid/gofermart/internal/config"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
-	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
-	"github.com/gin-gonic/gin"
 )
 
 //Запускаем pipeline для процесса регистрации клиента в сервисе
 
-func GetAllListWithdrawalsRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
-
+// func GetAllListWithdrawalsRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
+func GetAllListWithdrawalsRun(dataService *service.Data) (chan struct{}, error) {
 	p := pipeline.NewConcurrentPipeline()
 
 	//Проверяем наличие токена
@@ -35,25 +32,13 @@ func GetAllListWithdrawalsRun(ctx context.Context, c *gin.Context, cfg *config.C
 	})
 
 	if err := p.Start(); err != nil {
-		return err
+		log.Println(err)
 	}
 
-	data := &service.Data{}
-
-	//Устанавливаем контекст запроса gin
-	data.Default.Ctx = c
-
-	//Устанавливаем конфигурационные данные
-	data.Default.Cfg = cfg
-	data.Default.Ctx.Writer.Header().Set("Content-Type", "application/json")
-
-	//Устанавливаем канал завершения процесса
-	data.Default.Finished = finished
-
-	//Устанавливаем репозитарий для данных из базы
-	data.Default.Repository = rep
+	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
+	data.Default.Ctx.Writer.Header().Set("Content-Type", "application/json")
 
 	//Отправялем данные в пайплайн для обработки
 	p.Input() <- data
@@ -79,5 +64,5 @@ func GetAllListWithdrawalsRun(ctx context.Context, c *gin.Context, cfg *config.C
 
 	p.Stop()
 
-	return nil
+	return defaultSet.Finished, nil
 }
