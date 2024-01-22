@@ -38,24 +38,24 @@ func Run() {
 	////////////////////////////////Трассировка и логирование////////////////
 	//Инициализируем логирование и трассировку
 	//Извлекаем конф данные
-	conf_logger, conf_log_err := configyaml.ParseConfig()
-	if conf_log_err != nil {
-		log.Fatal(conf_log_err)
+	confLogger, confLogErr := configyaml.ParseConfig()
+	if confLogErr != nil {
+		log.Fatal(confLogErr)
 	}
 
 	//Инициализируем логгер
-	appLogger := logger.NewApiLogger(conf_logger)
+	appLogger := logger.NewApiLogger(confLogger)
 	appLogger.InitLogger()
 	appLogger.Info("Start Service API HANDLER")
 	appLogger.Infof(
 		"AppVersion: %s, LogLevel: %s, DevelopmentMode: %s",
-		conf_logger.AppVersion,
-		conf_logger.Logger.Level,
-		conf_logger.Server.Development,
+		confLogger.AppVersion,
+		confLogger.Logger.Level,
+		confLogger.Server.Development,
 	)
 
 	//Инициализируем трайсинг запросов
-	tracer, closer, err := jaeger.InitJaeger(conf_logger)
+	tracer, closer, err := jaeger.InitJaeger(confLogger)
 	if err != nil {
 		appLogger.Fatal("cannot create tracer", err)
 	}
