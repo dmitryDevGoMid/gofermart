@@ -1,3 +1,9 @@
 package main
 
-func main() {}
+import (
+	"github.com/dmitryDevGoMid/gofermart/internal/app"
+)
+
+func main() {
+	app.Run()
+}
