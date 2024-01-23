@@ -10,10 +10,9 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
+	"github.com/opentracing/opentracing-go"
 )
 
-// func AccrualRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
-// func AccrualRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
 func AccrualRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
 
 	sync.Lock()
@@ -21,6 +20,9 @@ func AccrualRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex
 	defer func() {
 		sync.Unlock()
 	}()
+
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.AccrualRun")
+	defer span.Finish()
 
 	p := pipeline.NewConcurrentPipeline()
 

@@ -15,7 +15,7 @@ type ResponseRegistration struct{}
 // Обрабатываем поступивший
 func (m ResponseRegistration) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 
-	span, _ := opentracing.StartSpanFromContext(ctx, "Service.Process.ResponseLogin")
+	span, _ := opentracing.StartSpanFromContext(ctx, "Service.Process.ResponseRegistration")
 	defer span.Finish()
 
 	data := result.(*service.Data)

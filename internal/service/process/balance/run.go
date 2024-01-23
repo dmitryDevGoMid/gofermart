@@ -11,8 +11,6 @@ import (
 	"github.com/opentracing/opentracing-go"
 )
 
-//func BalanceRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
-
 func BalanceRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.BalanceRun")
 	defer span.Finish()

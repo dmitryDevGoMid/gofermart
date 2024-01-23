@@ -18,10 +18,10 @@ type HandlerBalance struct{}
 func (m HandlerBalance) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerAccrual")
 
-	data := result.(*service.Data)
-
-	span, ctx := opentracing.StartSpanFromContext(*data.Default.TraceCtx, "Service.Process.GetBalance")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerBalance")
 	defer span.Finish()
+
+	data := result.(*service.Data)
 
 	//Сумма списаний
 	totalWithdraw, err := data.Default.Repository.SelectWithdrawByUserSum(ctx, &data.User.User)

@@ -11,14 +11,17 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/password"
+	"github.com/opentracing/opentracing-go"
 )
 
-// func LoginRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
 func LoginRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
 
 	sync.Lock()
 
 	defer sync.Unlock()
+
+	span, _ := opentracing.StartSpanFromContext(ctx, "Service.Process.LoginRun")
+	defer span.Finish()
 
 	p := pipeline.NewConcurrentPipeline()
 

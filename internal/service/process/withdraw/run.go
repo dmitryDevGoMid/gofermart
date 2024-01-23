@@ -12,7 +12,6 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
 )
 
-// func WithdrawRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
 func WithdrawRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
 	sync.Lock()
 

@@ -7,17 +7,21 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/gin-gonic/gin"
+	"github.com/opentracing/opentracing-go"
 )
 
 type OrderCRUDAccrual struct{}
 
 // Обрабатываем поступивший
 func (m OrderCRUDAccrual) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.OrderCRUDAccrual")
+	defer span.Finish()
+
 	data := result.(*service.Data)
 
 	data.Accrual.Accrual.IDUser = data.User.User.ID
 
-	err := data.Default.Repository.InsertAccrual(data.Default.Ctx.Request.Context(), &data.Accrual.Accrual)
+	err := data.Default.Repository.InsertAccrual(ctx, &data.Accrual.Accrual)
 
 	if err != nil {
 		data.Default.Response = func() {

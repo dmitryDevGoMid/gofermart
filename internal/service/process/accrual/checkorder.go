@@ -7,12 +7,16 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
+	"github.com/opentracing/opentracing-go"
 )
 
 type HandlerAccrualCheckOrder struct{}
 
 // Обрабатываем поступивший
 func (m HandlerAccrualCheckOrder) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
+	span, _ := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerAccrual")
+	defer span.Finish()
+
 	data := result.(*service.Data)
 
 	accrual := &repository.Accrual{}

@@ -10,10 +10,6 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 )
 
-//Запускаем pipeline для процесса регистрации клиента в сервисе
-
-// func GetAllListOrtdersRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
-
 func GetAllListOrtdersRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
 	p := pipeline.NewConcurrentPipeline()
 

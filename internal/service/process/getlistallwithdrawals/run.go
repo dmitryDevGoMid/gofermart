@@ -12,7 +12,6 @@ import (
 
 //Запускаем pipeline для процесса регистрации клиента в сервисе
 
-// func GetAllListWithdrawalsRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
 func GetAllListWithdrawalsRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
 	p := pipeline.NewConcurrentPipeline()
 

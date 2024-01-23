@@ -11,6 +11,7 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/password"
+	"github.com/opentracing/opentracing-go"
 )
 
 type User struct {
@@ -21,8 +22,10 @@ type User struct {
 
 //Запускаем pipeline для процесса регистрации клиента в сервисе
 
-// func RegistrationRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
 func RegistrationRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
+
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.RegistrationRun")
+	defer span.Finish()
 
 	p := pipeline.NewConcurrentPipeline()
 
