@@ -44,7 +44,7 @@ var loggerLevelMap = map[string]zapcore.Level{
 }
 
 // Конструктор для логгера возвращает структура с методами интерфейса
-func NewApiLogger(cfg *config.Config) *apiLogger {
+func NewAPILogger(cfg *config.Config) *apiLogger {
 	return &apiLogger{cfg: cfg}
 }
 

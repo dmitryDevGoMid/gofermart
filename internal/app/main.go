@@ -46,7 +46,7 @@ func Run() {
 	}
 
 	//Инициализируем логгер
-	appLogger := logger.NewApiLogger(confLogger)
+	appLogger := logger.NewAPILogger(confLogger)
 	appLogger.InitLogger()
 	appLogger.Info("Start Service API HANDLER")
 	appLogger.Infof(
