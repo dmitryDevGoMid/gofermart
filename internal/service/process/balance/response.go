@@ -1,6 +1,7 @@
 package balance
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -11,7 +12,7 @@ import (
 type ResponseBalance struct{}
 
 // Обрабатываем поступивший
-func (m ResponseBalance) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m ResponseBalance) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
 	dataResponse, err := json.Marshal(data.Balance.ResponseBalance)

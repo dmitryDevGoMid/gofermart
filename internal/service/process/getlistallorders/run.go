@@ -1,8 +1,8 @@
 package getlistallorders
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
@@ -14,7 +14,7 @@ import (
 
 // func GetAllListOrtdersRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
 
-func GetAllListOrtdersRun(dataService *service.Data) (chan struct{}, error) {
+func GetAllListOrtdersRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
 	p := pipeline.NewConcurrentPipeline()
 
 	//Проверяем наличие токена
@@ -32,8 +32,8 @@ func GetAllListOrtdersRun(dataService *service.Data) (chan struct{}, error) {
 		MaxWorkers: 1,
 	})
 
-	if err := p.Start(); err != nil {
-		log.Println(err)
+	if err := p.Start(ctx); err != nil {
+		return nil, err
 	}
 
 	data := dataService.GetNewService()

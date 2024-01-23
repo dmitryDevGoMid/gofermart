@@ -1,6 +1,7 @@
 package registration
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -21,7 +22,7 @@ type User struct {
 //Запускаем pipeline для процесса регистрации клиента в сервисе
 
 // func RegistrationRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
-func RegistrationRun(dataService *service.Data) (chan struct{}, error) {
+func RegistrationRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
 
 	p := pipeline.NewConcurrentPipeline()
 
@@ -49,7 +50,7 @@ func RegistrationRun(dataService *service.Data) (chan struct{}, error) {
 		MaxWorkers: 1,
 	})
 
-	if err := p.Start(); err != nil {
+	if err := p.Start(ctx); err != nil {
 		return nil, err
 	}
 

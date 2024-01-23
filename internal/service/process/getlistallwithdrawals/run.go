@@ -1,8 +1,8 @@
 package getlistallwithdrawals
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
@@ -13,7 +13,7 @@ import (
 //Запускаем pipeline для процесса регистрации клиента в сервисе
 
 // func GetAllListWithdrawalsRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
-func GetAllListWithdrawalsRun(dataService *service.Data) (chan struct{}, error) {
+func GetAllListWithdrawalsRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
 	p := pipeline.NewConcurrentPipeline()
 
 	//Проверяем наличие токена
@@ -31,8 +31,8 @@ func GetAllListWithdrawalsRun(dataService *service.Data) (chan struct{}, error) 
 		MaxWorkers: 1,
 	})
 
-	if err := p.Start(); err != nil {
-		log.Println(err)
+	if err := p.Start(ctx); err != nil {
+		return nil, err
 	}
 
 	data := dataService.GetNewService()

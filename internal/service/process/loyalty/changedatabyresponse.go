@@ -10,7 +10,7 @@ import (
 type CahngeDataByResponseLoyalty struct{}
 
 // Обрабатываем поступивший
-func (m CahngeDataByResponseLoyalty) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m CahngeDataByResponseLoyalty) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
 	catalogData := data.Default.Repository.GetCatalogData(context.TODO())

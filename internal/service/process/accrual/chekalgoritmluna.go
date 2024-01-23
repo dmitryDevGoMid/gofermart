@@ -1,6 +1,7 @@
 package accrual
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -13,7 +14,7 @@ import (
 type AccrualCheckAlgoritmLuna struct{}
 
 // Обрабатываем поступивший
-func (m AccrualCheckAlgoritmLuna) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m AccrualCheckAlgoritmLuna) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerAccrual")
 
 	data := result.(*service.Data)

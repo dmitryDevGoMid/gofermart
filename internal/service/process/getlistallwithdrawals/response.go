@@ -1,6 +1,7 @@
 package getlistallwithdrawals
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 type ResponseGetListAllOrdersByWithdraw struct{}
 
 // Обрабатываем поступивший
-func (m ResponseGetListAllOrdersByWithdraw) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m ResponseGetListAllOrdersByWithdraw) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
 	dataResponse, err := json.Marshal(data.Withdraw.WithdrawList)

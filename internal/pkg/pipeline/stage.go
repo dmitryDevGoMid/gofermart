@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
@@ -17,25 +18,24 @@ type StageWorker struct {
 }
 
 // Воркеры для каждого pipe свои кол-во определяется в PipelineOpts{maxWorkers}
-func (chb *StageWorker) Start(done chan struct{}) error {
+func (chb *StageWorker) Start(ctx context.Context, done chan struct{}) error {
 	for i := 0; i < chb.maxWorkers; i++ {
-		//Увеличиваем группу синхронизации на 1 - в данной реализации pipe&workpool в этом нет необходимости
+		//Увеличиваем группу синхронизации на 1 - в данной реализации pipe&workpool
 		chb.wg.Add(1)
-		// Запускаем в горотине метод по обработке данных, который реализует итерфейс StagePipe{Process(step Message) ([]Message, error)}
+		// Запускаем в горотине метод по обработке данных, который реализует итерфейс StagePipe{Process(ctx context.Context,step Message) ([]Message, error)}
 		go func() {
 			defer func() {
 				fmt.Println("Close gorutines...")
 				chb.wg.Done()
-				//Закрываем входящий канал для следующего pipe - данных больше не будет! (цепная реакция, которая закроет все горутины)
-				//close(chb.Output())
 			}()
 
 			for runProcess := range chb.Input() {
-				result, err := chb.pipe.Process(runProcess)
+				result, err := chb.pipe.Process(ctx, runProcess)
 				if err != nil {
 					log.Println(err)
 					continue
 				}
+				//Передаем данные в output канал текущего pipe, который является input для следующего
 				for _, r := range result {
 					chb.Output() <- r
 				}

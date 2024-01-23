@@ -65,9 +65,18 @@ func SetHandlers(r *gin.Engine, gh GoferHandler) {
 }
 
 func (gh *goferHandler) Register(c *gin.Context) {
+	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.Register")
+	span.SetOperationName("Handler.Mandler.Register")
+
+	if sc, ok := span.Context().(jaeger.SpanContext); ok {
+		fmt.Println("EMPTY!", sc.TraceID())
+		fmt.Println("EMPTY!", sc.SpanID())
+	}
+	defer span.Finish()
+
 	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
 
-	finished, err := registration.RegistrationRun(dataService)
+	finished, err := registration.RegistrationRun(ctx, dataService)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.Status(http.StatusBadRequest)
@@ -77,9 +86,18 @@ func (gh *goferHandler) Register(c *gin.Context) {
 }
 
 func (gh *goferHandler) Login(c *gin.Context) {
+	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.Login")
+	span.SetOperationName("Handler.Mandler.Login")
+
+	if sc, ok := span.Context().(jaeger.SpanContext); ok {
+		fmt.Println("EMPTY!", sc.TraceID())
+		fmt.Println("EMPTY!", sc.SpanID())
+	}
+	defer span.Finish()
+
 	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
 
-	finished, err := login.LoginRun(dataService, &syncLogin)
+	finished, err := login.LoginRun(ctx, dataService, &syncLogin)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.Status(http.StatusBadRequest)
@@ -90,9 +108,18 @@ func (gh *goferHandler) Login(c *gin.Context) {
 }
 
 func (gh *goferHandler) OrdersPost(c *gin.Context) {
+	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.OrdersPost")
+	span.SetOperationName("Handler.Mandler.OrdersPost")
+
+	if sc, ok := span.Context().(jaeger.SpanContext); ok {
+		fmt.Println("EMPTY!", sc.TraceID())
+		fmt.Println("EMPTY!", sc.SpanID())
+	}
+	defer span.Finish()
+
 	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
 
-	finished, err := accrual.AccrualRun(dataService, &syncOrdersAccrual)
+	finished, err := accrual.AccrualRun(ctx, dataService, &syncOrdersAccrual)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.Status(http.StatusBadRequest)
@@ -103,9 +130,18 @@ func (gh *goferHandler) OrdersPost(c *gin.Context) {
 }
 
 func (gh *goferHandler) OrdersGet(c *gin.Context) {
+	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.OrdersGet")
+	span.SetOperationName("Handler.Mandler.OrdersGet")
+
+	if sc, ok := span.Context().(jaeger.SpanContext); ok {
+		fmt.Println("EMPTY!", sc.TraceID())
+		fmt.Println("EMPTY!", sc.SpanID())
+	}
+	defer span.Finish()
+
 	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
 
-	finished, err := getlistallorders.GetAllListOrtdersRun(dataService)
+	finished, err := getlistallorders.GetAllListOrtdersRun(ctx, dataService)
 	if err != nil {
 		fmt.Println(err.Error())
 		c.Status(http.StatusBadRequest)
@@ -118,18 +154,14 @@ func (gh *goferHandler) OrdersGet(c *gin.Context) {
 func (gh *goferHandler) Balance(c *gin.Context) {
 	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.Balance")
 	span.SetOperationName("Handler.Mandler.Balance")
-	/*span_ := opentracing.SpanFromContext(ctx)
-	if span == nil {
-		fmt.Println("EMPTY!")
-	}*/
 
-	//Получаем TraceID
 	if sc, ok := span.Context().(jaeger.SpanContext); ok {
 		fmt.Println("EMPTY!", sc.TraceID())
 		fmt.Println("EMPTY!", sc.SpanID())
 	}
 	defer span.Finish()
 
+	//Передаем трассировку в трессинг
 	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
 
 	finished, err := balance.BalanceRun(ctx, dataService)
@@ -143,10 +175,18 @@ func (gh *goferHandler) Balance(c *gin.Context) {
 }
 
 func (gh *goferHandler) BalanceWithDraw(c *gin.Context) {
+	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.BalanceWithDraw")
+	span.SetOperationName("Handler.Mandler.BalanceWithDraw")
+
+	if sc, ok := span.Context().(jaeger.SpanContext); ok {
+		fmt.Println("EMPTY!", sc.TraceID())
+		fmt.Println("EMPTY!", sc.SpanID())
+	}
+	defer span.Finish()
 
 	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
 
-	finished, err := withdraw.WithdrawRun(dataService, &syncWithDraw)
+	finished, err := withdraw.WithdrawRun(ctx, dataService, &syncWithDraw)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -159,10 +199,18 @@ func (gh *goferHandler) BalanceWithDraw(c *gin.Context) {
 }
 
 func (gh *goferHandler) WithDrawals(c *gin.Context) {
+	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.WithDrawals")
+	span.SetOperationName("Handler.Mandler.WithDrawals")
+
+	if sc, ok := span.Context().(jaeger.SpanContext); ok {
+		fmt.Println("EMPTY!", sc.TraceID())
+		fmt.Println("EMPTY!", sc.SpanID())
+	}
+	defer span.Finish()
 
 	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
 
-	finished, err := getlistallwithdrawals.GetAllListWithdrawalsRun(dataService)
+	finished, err := getlistallwithdrawals.GetAllListWithdrawalsRun(ctx, dataService)
 
 	if err != nil {
 		fmt.Println(err.Error())

@@ -1,8 +1,8 @@
 package withdraw
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -13,7 +13,7 @@ import (
 )
 
 // func WithdrawRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
-func WithdrawRun(dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
+func WithdrawRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
 	sync.Lock()
 
 	defer sync.Unlock()
@@ -49,8 +49,8 @@ func WithdrawRun(dataService *service.Data, sync *sync.Mutex) (chan struct{}, er
 		MaxWorkers: 1,
 	})
 
-	if err := p.Start(); err != nil {
-		log.Println(err)
+	if err := p.Start(ctx); err != nil {
+		return nil, err
 	}
 
 	data := dataService.GetNewService()

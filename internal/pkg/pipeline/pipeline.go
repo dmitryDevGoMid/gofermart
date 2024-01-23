@@ -1,6 +1,9 @@
 package pipeline
 
-import "errors"
+import (
+	"context"
+	"errors"
+)
 
 // Пустой интерфейс в который кладем данные для движения по pipes
 type Message interface {
@@ -8,13 +11,13 @@ type Message interface {
 
 // Итерфейс для реализации pipe (каркас)
 type StagePipe interface {
-	Process(step Message) ([]Message, error)
+	Process(ctx context.Context, step Message) ([]Message, error)
 }
 
 // Интерфейс для организации запуска и передачи данных в pipe (внутренности)
 type Pipeline interface {
 	AddPipe(pipe StagePipe, opt *PipelineOpts)
-	Start() error
+	Start(ctx context.Context) error
 	Stop() error
 	Input() chan<- Message
 	Output() <-chan Message
@@ -73,7 +76,7 @@ func (ch *WorkersPipeline) Done() chan struct{} {
 var ErrConcurrentPipelineEmpty = errors.New("concurrent pipeline empty")
 
 // Запускаем обработку и движение данных в pipelines
-func (ch *WorkersPipeline) Start() error {
+func (ch *WorkersPipeline) Start(ctx context.Context) error {
 	//Создаем канал для сигнализации о завершении работы всем участникам (горутинам)
 	ch.done = make(chan struct{})
 
@@ -85,8 +88,8 @@ func (ch *WorkersPipeline) Start() error {
 	for i := 0; i < len(ch.workers); i++ {
 		// Получаем группу работников
 		g := ch.workers[i]
-		//Запускаем паралельную обработку данных (StagePipe{Process(step Message) ([]Message, error)}) на уровне одного pipe
-		g.Start(ch.done)
+		//Запускаем паралельную обработку данных (StagePipe{Process(ctx context.Context,step Message) ([]Message, error)}) на уровне одного pipe
+		g.Start(ctx, ch.done)
 	}
 
 	return nil
@@ -102,11 +105,6 @@ func (ch *WorkersPipeline) Stop() error {
 		//Запукаем цепную реакцию, которая закрываем все горутины во всех воркерах
 		close(i.Output())
 	}
-
-	//Закрвыаем выходной канал у последнего pipe
-	//sz := len(ch.workers)
-	//close(ch.workers[sz-1].Output())
-	//close(ch.Done())
 
 	return nil
 }

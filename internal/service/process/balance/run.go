@@ -3,17 +3,20 @@ package balance
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
+	"github.com/opentracing/opentracing-go"
 )
 
 //func BalanceRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}) error {
 
 func BalanceRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.BalanceRun")
+	defer span.Finish()
+
 	//p := pipeline.NewConcurrentPipeline()
 	p := pipeline.NewConcurrentPipeline()
 
@@ -30,8 +33,8 @@ func BalanceRun(ctx context.Context, dataService *service.Data) (chan struct{}, 
 		MaxWorkers: 1,
 	})
 
-	if err := p.Start(); err != nil {
-		log.Println(err)
+	if err := p.Start(ctx); err != nil {
+		return nil, err
 	}
 
 	data := dataService.GetNewService()

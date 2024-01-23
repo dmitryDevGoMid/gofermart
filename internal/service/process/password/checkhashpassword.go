@@ -1,6 +1,7 @@
 package password
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -12,7 +13,7 @@ import (
 type Authetication struct{}
 
 // func (chain *CheckGzip) run(r *Request) error {
-func (m Authetication) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m Authetication) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
 	err := security.VerifyPassword(data.User.User.Password, data.User.UserRequest.Password)

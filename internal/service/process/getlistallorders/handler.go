@@ -1,6 +1,7 @@
 package getlistallorders
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -12,12 +13,12 @@ import (
 type HandlerGetListAllOrdersByAccrual struct{}
 
 // Обрабатываем поступившие данные
-func (m HandlerGetListAllOrdersByAccrual) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m HandlerGetListAllOrdersByAccrual) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerGetListAllOrders")
 
 	data := result.(*service.Data)
 
-	listOrders, err := data.Default.Repository.SelectAccrualByUser(data.Default.Ctx.Request.Context(), &data.User.User)
+	listOrders, err := data.Default.Repository.SelectAccrualByUser(ctx, &data.User.User)
 
 	fmt.Println(listOrders)
 

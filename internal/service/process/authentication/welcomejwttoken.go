@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -12,7 +13,7 @@ import (
 type CheckJWTToken struct {
 }
 
-func (chain CheckJWTToken) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (chain CheckJWTToken) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Cookes Cookes")
 	data := result.(*service.Data)
 

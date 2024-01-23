@@ -1,6 +1,7 @@
 package login
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -13,7 +14,7 @@ import (
 )
 
 // func LoginRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
-func LoginRun(dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
+func LoginRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
 
 	sync.Lock()
 
@@ -45,14 +46,13 @@ func LoginRun(dataService *service.Data, sync *sync.Mutex) (chan struct{}, error
 		MaxWorkers: 1,
 	})
 
-	if err := p.Start(); err != nil {
+	if err := p.Start(ctx); err != nil {
 		return nil, err
 	}
 
 	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
-	//getMetrics := data.GetMetrics
 
 	// Отправялем данные в пайплайн для обработки
 	p.Input() <- data

@@ -1,6 +1,7 @@
 package getlistallorders
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 type ResponseGetListAllOrdersByAccrual struct{}
 
 // Обрабатываем поступивший
-func (m ResponseGetListAllOrdersByAccrual) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m ResponseGetListAllOrdersByAccrual) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
 	dataResponse, err := json.Marshal(data.Accrual.AccrualList)

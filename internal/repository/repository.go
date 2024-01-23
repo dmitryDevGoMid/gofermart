@@ -100,6 +100,9 @@ func (rep *repository) UpdateAccrualByID(ctx context.Context, dataAccrual *Accru
 
 // Получаем запись по email клиента
 func (rep *repository) SelectUserByEmail(ctx context.Context, dataUser *User) (*User, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectUserByEmail")
+	defer span.Finish()
+
 	// Query for a value based on a single row.
 	if err := rep.db.QueryRow(ctx, "SELECT password, id FROM users WHERE login = $1",
 		dataUser.Login).Scan(&dataUser.Password, &dataUser.ID); err != nil {
@@ -165,6 +168,9 @@ func (rep *repository) SelectAccrualByUserSum(ctx context.Context, dataUser *Use
 
 // Получаем список всех списаний клиента по UserId
 func (rep *repository) SelectWithdrawByUser(ctx context.Context, dataUser *User) ([]WithdrawList, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectWithdrawByUser")
+	defer span.Finish()
+
 	withdrawCollect := []WithdrawList{}
 	withdraw := WithdrawList{}
 
@@ -192,6 +198,9 @@ func (rep *repository) SelectWithdrawByUser(ctx context.Context, dataUser *User)
 
 // Получаем список всех начислений клиента по UserId
 func (rep *repository) SelectAccrualByUser(ctx context.Context, dataUser *User) ([]AccrualList, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectAccrualByUser")
+	defer span.Finish()
+
 	accrualCollect := []AccrualList{}
 	accrual := AccrualList{}
 	sqlQuery := `SELECT id_order, accrual, type_status.name as status, date_trunc('second',uploaded_at::timestamptz)
@@ -220,6 +229,8 @@ func (rep *repository) SelectAccrualByUser(ctx context.Context, dataUser *User) 
 
 // Получаем запись из таблицы по номеру заказа
 func (rep *repository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccrual *[]Accrual) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectAccrualForSendLoyalty")
+	defer span.Finish()
 
 	rows, err := rep.db.Query(ctx, "SELECT * FROM user_accrual Where id_status = $1 or id_status = $2 or id_status = $3",
 		rep.catalogData.TypeStatus["NEW"], rep.catalogData.TypeStatus["PROCESSING"], rep.catalogData.TypeStatus["REGISTERED"])
@@ -256,6 +267,9 @@ func (rep *repository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccr
 
 // Получаем запись из таблицы по номеру заказа
 func (rep *repository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *Accrual) error {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectAccrualByIDorder")
+	defer span.Finish()
+
 	rows, err := rep.db.Query(ctx, "SELECT * FROM user_accrual Where id_order = $1", dataAccrual.IDorder)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -286,6 +300,9 @@ func (rep *repository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *
 
 // Получаем список всех списаний клиента по UserId
 func (rep *repository) SelectWithdrawByUsers(ctx context.Context, dataUser *User) ([]WithdrawList, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectWithdrawByUsers")
+	defer span.Finish()
+
 	withdrawCollect := []WithdrawList{}
 	withdraw := WithdrawList{}
 
@@ -314,6 +331,9 @@ func (rep *repository) SelectWithdrawByUsers(ctx context.Context, dataUser *User
 
 // Получаем баланс клиента по UserId
 func (rep *repository) SelectBalanceByUser(ctx context.Context, dataUser *User) (Balance, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectBalanceByUser")
+	defer span.Finish()
+
 	balanceUser := Balance{}
 	if err := rep.db.QueryRow(ctx, "SELECT * FROM user_balance WHERE id_user = $1",
 		dataUser.ID).Scan(&balanceUser); err != nil {
@@ -325,6 +345,9 @@ func (rep *repository) SelectBalanceByUser(ctx context.Context, dataUser *User) 
 
 // Получаем айди статуса по его названию
 func (rep *repository) SelectTypeStatusByName(ctx context.Context, nametype string) (int, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectTypeStatusByName")
+	defer span.Finish()
+
 	idTypeStatus := 0
 
 	if err := rep.db.QueryRow(ctx, "SELECT * FROM type_status WHERE name = $1",
@@ -383,6 +406,9 @@ func (rep *repository) SelectTypeStatusAll(ctx context.Context) error {
 func (rep *repository) InsertUser(ctx context.Context, dataUser *User) (*User, error) {
 	fmt.Println("DB InsertUser")
 
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.InsertUser")
+	defer span.Finish()
+
 	var idInsertRow int
 
 	fmt.Println(dataUser)
@@ -402,6 +428,10 @@ func (rep *repository) InsertUser(ctx context.Context, dataUser *User) (*User, e
 func (rep *repository) InsertAccrual(ctx context.Context, accrual *Accrual) error {
 	fmt.Println("DB insertAccrual")
 	fmt.Println("InsertAccrual:", rep.catalogData.TypeStatus["NEW"])
+
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.InsertAccrual")
+	defer span.Finish()
+
 	_, err := rep.db.Exec(ctx,
 		"INSERT INTO user_accrual(id_user, id_order, accrual, id_status) VALUES (@IDUser, @IDorder, @accrual, @IDStatus)",
 		pgx.NamedArgs{
@@ -422,6 +452,9 @@ func (rep *repository) InsertAccrual(ctx context.Context, accrual *Accrual) erro
 
 func (rep *repository) InsertWithdraw(ctx context.Context, withdraw *Withdraw) error {
 	fmt.Println("DB insertWithdraw")
+
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.InsertWithdraw")
+	defer span.Finish()
 
 	_, err := rep.db.Exec(ctx,
 		"INSERT INTO user_withdraw(id_user, id_order, sum, id_status) VALUES (@IDUser, @IDorder, @sum, @IDStatus)",

@@ -1,6 +1,7 @@
 package accrual
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
@@ -11,7 +12,7 @@ import (
 type OrderCRUDAccrual struct{}
 
 // Обрабатываем поступивший
-func (m OrderCRUDAccrual) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m OrderCRUDAccrual) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
 	data.Accrual.Accrual.IDUser = data.User.User.ID

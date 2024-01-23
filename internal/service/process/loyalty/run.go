@@ -58,7 +58,7 @@ func LoyaltyRun(ctx context.Context, cfg *config.Config, repository repository.R
 		MaxWorkers: 1,
 	})
 
-	if err := p.Start(); err != nil {
+	if err := p.Start(ctx); err != nil {
 		return err
 	}
 

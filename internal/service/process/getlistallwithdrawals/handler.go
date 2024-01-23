@@ -1,23 +1,28 @@
 package getlistallwithdrawals
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
+	"github.com/opentracing/opentracing-go"
 )
 
 type HandlerGetListAllOrdersByWithDraw struct{}
 
 // Обрабатываем поступившие данные
-func (m HandlerGetListAllOrdersByWithDraw) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m HandlerGetListAllOrdersByWithDraw) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerGetListAllOrdersByWithDraw")
+
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerGetListAllOrdersByWithDraw")
+	defer span.Finish()
 
 	data := result.(*service.Data)
 
-	listWithdrawals, err := data.Default.Repository.SelectWithdrawByUsers(data.Default.Ctx.Request.Context(), &data.User.User)
+	listWithdrawals, err := data.Default.Repository.SelectWithdrawByUsers(ctx, &data.User.User)
 
 	fmt.Println(listWithdrawals)
 

@@ -1,6 +1,7 @@
 package authentication
 
 import (
+	"context"
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
@@ -18,7 +19,7 @@ type Claims struct {
 
 type SetJWTToken struct{}
 
-func (chain SetJWTToken) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (chain SetJWTToken) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 
 	data := result.(*service.Data)
 

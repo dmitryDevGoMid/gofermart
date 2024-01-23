@@ -1,6 +1,7 @@
 package balance
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"net/http"
@@ -14,7 +15,7 @@ import (
 type HandlerBalance struct{}
 
 // Обрабатываем поступившие данные
-func (m HandlerBalance) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m HandlerBalance) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerAccrual")
 
 	data := result.(*service.Data)

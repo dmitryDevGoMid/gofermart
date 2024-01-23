@@ -47,3 +47,12 @@
 {"LEVEL":"ERROR","TIME":"2024-01-22T15:24:09.890+0300","CALLER":"app/main.go:31","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/balance/"}
 {"LEVEL":"ERROR","TIME":"2024-01-22T15:24:13.098+0300","CALLER":"app/main.go:31","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/orders/"}
 {"LEVEL":"ERROR","TIME":"2024-01-22T15:24:15.888+0300","CALLER":"app/main.go:31","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/withdrawals/"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:07:34.434+0300","CALLER":"app/main.go:51","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:07:34.440+0300","CALLER":"app/main.go:52","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:07:34.445+0300","CALLER":"app/main.go:64","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:14:46.560+0300","CALLER":"app/main.go:51","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:14:46.560+0300","CALLER":"app/main.go:52","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:14:46.563+0300","CALLER":"app/main.go:64","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:24:55.984+0300","CALLER":"app/main.go:51","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:24:55.984+0300","CALLER":"app/main.go:52","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:24:55.987+0300","CALLER":"app/main.go:64","MESSAGE":"Jaeger connected"}

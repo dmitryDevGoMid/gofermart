@@ -1,6 +1,7 @@
 package gzipandunserialize
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -12,7 +13,7 @@ import (
 
 type UnserializeUser struct{}
 
-func (chain UnserializeUser) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (chain UnserializeUser) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 
 	fmt.Println("Processing UnserializeUser")
 
@@ -37,7 +38,7 @@ func (chain UnserializeUser) Process(result pipeline.Message) ([]pipeline.Messag
 
 type UnserializeLogin struct{}
 
-func (chain UnserializeLogin) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (chain UnserializeLogin) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 
 	data := result.(*service.Data)
 
@@ -60,7 +61,7 @@ func (chain UnserializeLogin) Process(result pipeline.Message) ([]pipeline.Messa
 
 type UnserializeWithdraw struct{}
 
-func (chain UnserializeWithdraw) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (chain UnserializeWithdraw) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 
 	data := result.(*service.Data)
 

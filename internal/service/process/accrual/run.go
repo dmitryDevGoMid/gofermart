@@ -1,8 +1,8 @@
 package accrual
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"sync"
 	"time"
 
@@ -14,7 +14,7 @@ import (
 
 // func AccrualRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
 // func AccrualRun(ctx context.Context, c *gin.Context, cfg *config.Config, rep repository.Repository, finished chan struct{}, sync *sync.Mutex) error {
-func AccrualRun(dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
+func AccrualRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
 
 	sync.Lock()
 
@@ -53,8 +53,8 @@ func AccrualRun(dataService *service.Data, sync *sync.Mutex) (chan struct{}, err
 		MaxWorkers: 1,
 	})
 
-	if err := p.Start(); err != nil {
-		log.Println(err)
+	if err := p.Start(ctx); err != nil {
+		return nil, err
 	}
 
 	data := dataService.GetNewService()

@@ -1,23 +1,27 @@
 package accrual
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
+	"github.com/opentracing/opentracing-go"
 )
 
 type HandlerAccrual struct{}
 
 // Обрабатываем поступившие данные
-func (m HandlerAccrual) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m HandlerAccrual) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerAccrual")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerAccrual")
+	defer span.Finish()
 
 	data := result.(*service.Data)
 
-	err := data.Default.Repository.SelectAccrualByIDorder(data.Default.Ctx.Request.Context(), &data.Accrual.Accrual)
+	err := data.Default.Repository.SelectAccrualByIDorder(ctx, &data.Accrual.Accrual)
 
 	if err != nil {
 		data.Default.Response = func() {

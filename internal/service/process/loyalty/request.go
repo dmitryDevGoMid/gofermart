@@ -1,6 +1,7 @@
 package loyalty
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -13,7 +14,7 @@ import (
 type RequestLoyalty struct{}
 
 // Обрабатываем поступивший
-func (m RequestLoyalty) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m RequestLoyalty) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
 	client := resty.New()

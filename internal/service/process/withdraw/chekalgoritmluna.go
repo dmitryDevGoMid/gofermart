@@ -1,19 +1,24 @@
 package withdraw
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/luna"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
+	"github.com/opentracing/opentracing-go"
 )
 
 type WithDrawCheckAlgoritmLuna struct{}
 
 // Обрабатываем поступивший
-func (m WithDrawCheckAlgoritmLuna) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m WithDrawCheckAlgoritmLuna) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerAccrual")
+
+	span, _ := opentracing.StartSpanFromContext(ctx, "Service.Process.WithDrawCheckAlgoritmLuna")
+	defer span.Finish()
 
 	data := result.(*service.Data)
 

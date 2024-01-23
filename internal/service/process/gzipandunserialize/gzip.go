@@ -1,6 +1,7 @@
 package gzipandunserialize
 
 import (
+	"context"
 	"fmt"
 	"io"
 
@@ -12,7 +13,7 @@ import (
 type Gzip struct{}
 
 // func (chain *CheckGzip) run(r *Request) error {
-func (m Gzip) Process(result pipeline.Message) ([]pipeline.Message, error) {
+func (m Gzip) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 
 	fmt.Println("Processing Gzip")
 
