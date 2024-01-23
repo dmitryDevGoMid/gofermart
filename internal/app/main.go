@@ -27,8 +27,10 @@ import (
 func openTracing(log logger.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		span := opentracing.GlobalTracer().StartSpan("apiServer")
-		c.Request.WithContext(opentracing.ContextWithSpan(c.Request.Context(), span))
-		log.Error(c.Request.Context(), "Api:=>%v", c.Request.URL)
+		if span != nil {
+			_ = c.Request.WithContext(opentracing.ContextWithSpan(c.Request.Context(), span))
+			log.Error(c.Request.Context(), "Api:=>%v", c.Request.URL)
+		}
 		c.Next()
 	}
 }
@@ -105,7 +107,9 @@ func Run() {
 	router := gin.Default()
 
 	//Указываем мидделвари для трассировки
-	router.Use(openTracing(appLogger))
+	if 1 == 2 {
+		router.Use(openTracing(appLogger))
+	}
 
 	handlersGofermart := handlers.NewGoferHandler(cfg, repository)
 
