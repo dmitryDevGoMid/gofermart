@@ -292,6 +292,10 @@ func (rep *repository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *
 		return nil, err
 	}
 
+	if len(accrualRows) <= 0 {
+		return nil, nil
+	}
+
 	fmt.Println(accrualRows)
 
 	//Забасываем данные по линку перменной dataAccrual
