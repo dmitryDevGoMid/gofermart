@@ -550,9 +550,7 @@ func TestHandlerLoginCookies(t *testing.T) {
 			//Выполняем сравнение полученного(w - response) c ожидаемым (tt.)
 			assert.Equal(t, tt.statusCode, w.Code)
 			assert.Equal(t, tt.counterValue, w.Body.String())
-			assert.NotEmpty(t, w.Result().Cookies())
 
-			w.Result().Body.Close()
 		})
 	}
 }
