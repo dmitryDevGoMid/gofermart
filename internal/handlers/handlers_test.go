@@ -551,6 +551,8 @@ func TestHandlerLoginCookies(t *testing.T) {
 			assert.Equal(t, tt.statusCode, w.Code)
 			assert.Equal(t, tt.counterValue, w.Body.String())
 			assert.NotEmpty(t, w.Result().Cookies())
+
+			w.Result().Body.Close()
 		})
 	}
 }
