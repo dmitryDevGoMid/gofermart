@@ -65,17 +65,6 @@ func Run() {
 
 	opentracing.SetGlobalTracer(tracer)
 	defer closer.Close()
-	/*appLogger.Info("Opentracing connected")
-
-	opts, err := getOpts(appLogger)
-	if err != nil {
-		appLogger.Fatal("cannot get option for gRPC client", err)
-	}
-	conn, err := grpc.Dial(authAddr, opts...)
-	if err != nil {
-		log.Panicln(err)
-	}*/
-
 	////////////////////////////////ТРассировка и логирование////////////////
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -111,7 +100,8 @@ func Run() {
 		router.Use(openTracing(appLogger))
 	}
 
-	handlersGofermart := handlers.NewGoferHandler(cfg, repository)
+	tracing := jaeger.NewTracing(cfg)
+	handlersGofermart := handlers.NewGoferHandler(cfg, repository, tracing)
 
 	//Запускаем обработчики запросов http
 	handlers.SetHandlers(router, handlersGofermart)

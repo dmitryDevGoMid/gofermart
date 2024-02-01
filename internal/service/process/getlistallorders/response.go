@@ -16,6 +16,11 @@ type ResponseGetListAllOrdersByAccrual struct{}
 func (m ResponseGetListAllOrdersByAccrual) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	data := result.(*service.Data)
 
+	span, _ := data.Default.Tracing.Tracing(ctx, "Service.Process.ResponseGetListAllOrdersByAccrual")
+	if span != nil {
+		defer span.Finish()
+	}
+
 	dataResponse, err := json.Marshal(data.Accrual.AccrualList)
 
 	fmt.Println(dataResponse)

@@ -56,3 +56,12 @@
 {"LEVEL":"INFO","TIME":"2024-01-23T17:24:55.984+0300","CALLER":"app/main.go:51","MESSAGE":"Start Service API HANDLER"}
 {"LEVEL":"INFO","TIME":"2024-01-23T17:24:55.984+0300","CALLER":"app/main.go:52","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
 {"LEVEL":"INFO","TIME":"2024-01-23T17:24:55.987+0300","CALLER":"app/main.go:64","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:38:57.804+0300","CALLER":"app/main.go:51","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:38:57.805+0300","CALLER":"app/main.go:52","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-01-23T17:38:57.809+0300","CALLER":"app/main.go:64","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-01-29T20:14:21.099+0300","CALLER":"app/main.go:51","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-01-29T20:14:21.100+0300","CALLER":"app/main.go:52","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-01-29T20:14:21.103+0300","CALLER":"app/main.go:64","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-01-29T20:15:58.536+0300","CALLER":"app/main.go:51","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-01-29T20:15:58.537+0300","CALLER":"app/main.go:52","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-01-29T20:15:58.545+0300","CALLER":"app/main.go:64","MESSAGE":"Jaeger connected"}

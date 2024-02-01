@@ -8,7 +8,6 @@ import (
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
-	"github.com/opentracing/opentracing-go"
 )
 
 type HandlerRegistration struct{}
@@ -17,16 +16,18 @@ type HandlerRegistration struct{}
 func (m HandlerRegistration) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Processing HandlerRegistration")
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerRegistration")
-	defer span.Finish()
-
 	data := result.(*service.Data)
+
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.HandlerRegistration")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	user, err := data.Default.Repository.SelectUserByEmail(ctx, &data.User.User)
 
 	if err != nil {
 		data.Default.Response = func() {
-			data.Default.Ctx.Status(http.StatusBadRequest)
+			data.Default.Ctx.Status(http.StatusInternalServerError)
 		}
 		return []pipeline.Message{data}, err
 
@@ -44,7 +45,7 @@ func (m HandlerRegistration) Process(ctx context.Context, result pipeline.Messag
 	//Инициализируем ошибку для ответа клиенту
 	if err != nil {
 		data.Default.Response = func() {
-			data.Default.Ctx.Status(http.StatusBadRequest)
+			data.Default.Ctx.Status(http.StatusInternalServerError)
 		}
 		return []pipeline.Message{data}, err
 

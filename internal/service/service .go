@@ -6,10 +6,10 @@
 package service
 
 import (
-	"context"
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
+	"github.com/dmitryDevGoMid/gofermart/internal/pkg/jaeger"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/gin-gonic/gin"
 )
@@ -43,11 +43,13 @@ func (current *Data) GetNewService() *Data {
 	data.Default.Finished = finished
 	// Устанавливаем репозитарий для данных из базы
 	data.Default.Repository = current.Default.Repository
+	// Трассировка
+	data.Default.Tracing = current.Default.Tracing
 
 	return data
 }
 
-func SetServiceData(c *gin.Context, cfg *config.Config, rep repository.Repository) *Data {
+func SetServiceData(c *gin.Context, cfg *config.Config, rep repository.Repository, tracing jaeger.TraicingInterface) *Data {
 	//func SetServiceData(c context.Context, cfg *config.Config, rep repository.Repository) *Data {
 	data := &Data{}
 
@@ -57,6 +59,8 @@ func SetServiceData(c *gin.Context, cfg *config.Config, rep repository.Repositor
 	data.Default.Cfg = cfg
 	// Устанавливаем репозитарий для данных из базы
 	data.Default.Repository = rep
+	// Трассировка
+	data.Default.Tracing = tracing
 
 	return data
 }
@@ -104,7 +108,7 @@ type Default struct {
 	ResponseError func()
 	Finished      chan struct{}
 	Body          []byte
-	TraceCtx      *context.Context
+	Tracing       jaeger.TraicingInterface
 }
 
 type Loyalty struct {

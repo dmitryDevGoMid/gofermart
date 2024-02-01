@@ -7,24 +7,25 @@ import (
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
-	"github.com/opentracing/opentracing-go"
 )
 
 type HandlerLogin struct{}
 
 // Обрабатываем поступивший
 func (m HandlerLogin) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerLogin")
-	defer span.Finish()
-
 	data := result.(*service.Data)
+
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.HandlerLogin")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	user, err := data.Default.Repository.SelectUserByEmail(ctx, &data.User.User)
 
 	//Инициализируем ошибку для ответа клиенту
 	if err != nil {
 		data.Default.Response = func() {
-			data.Default.Ctx.Status(http.StatusBadRequest)
+			data.Default.Ctx.Status(http.StatusInternalServerError)
 		}
 
 		return []pipeline.Message{data}, err

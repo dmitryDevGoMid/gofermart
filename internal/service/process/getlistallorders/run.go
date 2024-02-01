@@ -11,6 +11,14 @@ import (
 )
 
 func GetAllListOrtdersRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
+
+	data := dataService.GetNewService()
+
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.ResponseGetListAllOrdersByAccrual")
+	if span != nil {
+		defer span.Finish()
+	}
+
 	p := pipeline.NewConcurrentPipeline()
 
 	//Проверяем наличие токена
@@ -28,11 +36,10 @@ func GetAllListOrtdersRun(ctx context.Context, dataService *service.Data) (chan 
 		MaxWorkers: 1,
 	})
 
+	//Запускаем пайплайн в работу
 	if err := p.Start(ctx); err != nil {
 		return nil, err
 	}
-
-	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
 	data.Default.Ctx.Writer.Header().Set("Content-Type", "application/json")

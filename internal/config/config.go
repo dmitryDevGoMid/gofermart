@@ -52,6 +52,12 @@ type Metrics struct {
 
 type Server struct {
 	Address string `env:"RUN_ADDRESS"`
+
+	//Флаг для отключения и влючения трассировки(по умолчанию трассирока включена)
+	TracingEnabled bool
+
+	//Флаг для отключения и влючения тестирования(по умолчанию тестирование выключено)
+	TestingEnabled bool
 }
 
 type Config struct {
@@ -76,6 +82,8 @@ var (
 	loggerLevel    string
 	serializeType  string
 	enableGzip     bool
+	tracingEnabled bool
+	testingEnabled bool
 
 	restoreFile       bool
 	storeIntervalFile int
@@ -106,6 +114,8 @@ func init() {
 	//Serialize Type
 	flag.BoolVar(&enableGzip, "gzip", false, "set gzip for agent and server")
 
+	flag.BoolVar(&testingEnabled, "te", false, "set enabled testing")
+
 	//File
 	flag.BoolVar(&restoreFile, "rf", true, "restore file")
 	//flag.StringVar(&fileStoragePath, "f", "/tmp/metrics-db.json", "path file")
@@ -122,9 +132,10 @@ func init() {
 
 	//sha 256 key
 	flag.StringVar(&keySHA256, "k", "", "set key for calc SHA256")
-
 	//Flag adres accrual system
 	flag.StringVar(&accrualSystemAdress, "r", "http://localhost:8080", "set adress for send loaylte accrual")
+
+	flag.BoolVar(&tracingEnabled, "", true, "set tracing server")
 }
 
 // Разбираем конфигурацию по структурам
@@ -137,6 +148,8 @@ func ParseConfig() (*Config, error) {
 	//config.Metrics.ReportInterval = reportInterval
 
 	config.Server.Address = address
+	config.Server.TracingEnabled = tracingEnabled
+	config.Server.TestingEnabled = testingEnabled
 
 	config.Logger.Encoding = loggerEncoding
 	config.Logger.Level = loggerLevel

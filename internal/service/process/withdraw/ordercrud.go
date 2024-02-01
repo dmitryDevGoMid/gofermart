@@ -7,17 +7,19 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/gin-gonic/gin"
-	"github.com/opentracing/opentracing-go"
 )
 
 type OrderCRUDWithdraw struct{}
 
 // Обрабатываем поступивший
 func (m OrderCRUDWithdraw) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerWithdraw")
-	defer span.Finish()
 
 	data := result.(*service.Data)
+
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.OrderCRUDWithdraw")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	data.Withdraw.Withdraw.IDUser = data.User.User.ID
 
@@ -25,9 +27,9 @@ func (m OrderCRUDWithdraw) Process(ctx context.Context, result pipeline.Message)
 
 	if err != nil {
 		data.Default.Response = func() {
-			data.Default.Ctx.JSON(http.StatusBadRequest, gin.H{
-				"code":    http.StatusBadRequest,
-				"message": string("Trable InsertWithdraw"), // cast it to string before showing
+			data.Default.Ctx.JSON(http.StatusInternalServerError, gin.H{
+				"code":    http.StatusInternalServerError,
+				"message": string("Trable StatusInternalServerError"), // cast it to string before showing
 			})
 		}
 

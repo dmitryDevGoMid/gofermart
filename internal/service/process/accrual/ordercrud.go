@@ -7,17 +7,18 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/gin-gonic/gin"
-	"github.com/opentracing/opentracing-go"
 )
 
 type OrderCRUDAccrual struct{}
 
 // Обрабатываем поступивший
 func (m OrderCRUDAccrual) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.OrderCRUDAccrual")
-	defer span.Finish()
-
 	data := result.(*service.Data)
+
+	span, _ := data.Default.Tracing.Tracing(ctx, "Service.Process.OrderCRUDAccrual")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	data.Accrual.Accrual.IDUser = data.User.User.ID
 

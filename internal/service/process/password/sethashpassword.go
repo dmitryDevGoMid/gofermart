@@ -29,7 +29,9 @@ func (m SetHashPassword) Process(ctx context.Context, result pipeline.Message) (
 
 	}
 
-	data.User.User.Password = data.User.HashPassword
+	if !data.Default.Cfg.Server.TestingEnabled {
+		data.User.User.Password = data.User.HashPassword
+	}
 
 	fmt.Println(data.User.User)
 

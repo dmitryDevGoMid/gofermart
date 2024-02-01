@@ -8,7 +8,6 @@ import (
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
-	"github.com/opentracing/opentracing-go"
 )
 
 type HandlerGetListAllOrdersByWithDraw struct{}
@@ -17,10 +16,12 @@ type HandlerGetListAllOrdersByWithDraw struct{}
 func (m HandlerGetListAllOrdersByWithDraw) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerGetListAllOrdersByWithDraw")
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerGetListAllOrdersByWithDraw")
-	defer span.Finish()
-
 	data := result.(*service.Data)
+
+	span, _ := data.Default.Tracing.Tracing(ctx, "Service.Process.HandlerGetListAllOrdersByWithDraw")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	listWithdrawals, err := data.Default.Repository.SelectWithdrawByUsers(ctx, &data.User.User)
 
@@ -28,7 +29,7 @@ func (m HandlerGetListAllOrdersByWithDraw) Process(ctx context.Context, result p
 
 	if err != nil {
 		data.Default.Response = func() {
-			data.Default.Ctx.Status(http.StatusBadRequest)
+			data.Default.Ctx.Status(http.StatusInternalServerError)
 		}
 
 		return []pipeline.Message{data}, err

@@ -7,17 +7,18 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/gin-gonic/gin"
-	"github.com/opentracing/opentracing-go"
 )
 
 type ResponseLogin struct{}
 
 // Обрабатываем поступивший
 func (m ResponseLogin) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
-	span, _ := opentracing.StartSpanFromContext(ctx, "Service.Process.ResponseLogin")
-	defer span.Finish()
-
 	data := result.(*service.Data)
+
+	span, _ := data.Default.Tracing.Tracing(ctx, "Service.Process.ResponseLogin")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	data.Default.Response = func() {
 		data.Default.Ctx.JSON(http.StatusOK, gin.H{

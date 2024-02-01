@@ -12,11 +12,14 @@ func PrepeareDataByAccrual(ctx context.Context, data *service.Data) error {
 
 	data.Loyalty.Accruals = &[]repository.Accrual{}
 
-	err := data.Default.Repository.SelectAccrualForSendLoyalty(ctx, data.Loyalty.Accruals)
+	dataLinkAccrual, err := data.Default.Repository.SelectAccrualForSendLoyalty(ctx, data.Loyalty.Accruals)
 
 	if err != nil {
 		return err
 	}
+
+	//Если нет ошибок значит есть данные сохраняем ссылку в структуре
+	data.Loyalty.Accruals = dataLinkAccrual
 
 	return nil
 }

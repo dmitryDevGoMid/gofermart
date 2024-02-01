@@ -18,6 +18,11 @@ func (m ResponseGetListAllOrdersByWithdraw) Process(ctx context.Context, result 
 
 	dataResponse, err := json.Marshal(data.Withdraw.WithdrawList)
 
+	span, _ := data.Default.Tracing.Tracing(ctx, "Service.Process.ResponseGetListAllOrdersByWithdraw")
+	if span != nil {
+		defer span.Finish()
+	}
+
 	fmt.Println(dataResponse)
 
 	if err != nil {
