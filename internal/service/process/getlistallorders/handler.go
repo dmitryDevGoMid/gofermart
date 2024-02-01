@@ -8,7 +8,6 @@ import (
 
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
-	"github.com/opentracing/opentracing-go"
 )
 
 type HandlerGetListAllOrdersByAccrual struct{}
@@ -17,10 +16,12 @@ type HandlerGetListAllOrdersByAccrual struct{}
 func (m HandlerGetListAllOrdersByAccrual) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerGetListAllOrders")
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerGetListAllOrdersByAccrual")
-	defer span.Finish()
-
 	data := result.(*service.Data)
+
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.HandlerGetListAllOrdersByAccrual")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	listOrders, err := data.Default.Repository.SelectAccrualByUser(ctx, &data.User.User)
 
@@ -28,7 +29,7 @@ func (m HandlerGetListAllOrdersByAccrual) Process(ctx context.Context, result pi
 
 	if err != nil {
 		data.Default.Response = func() {
-			data.Default.Ctx.Status(http.StatusBadRequest)
+			data.Default.Ctx.Status(http.StatusInternalServerError)
 		}
 
 		return []pipeline.Message{data}, err

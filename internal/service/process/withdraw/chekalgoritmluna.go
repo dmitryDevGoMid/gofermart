@@ -8,7 +8,6 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/luna"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
-	"github.com/opentracing/opentracing-go"
 )
 
 type WithDrawCheckAlgoritmLuna struct{}
@@ -17,10 +16,12 @@ type WithDrawCheckAlgoritmLuna struct{}
 func (m WithDrawCheckAlgoritmLuna) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerAccrual")
 
-	span, _ := opentracing.StartSpanFromContext(ctx, "Service.Process.WithDrawCheckAlgoritmLuna")
-	defer span.Finish()
-
 	data := result.(*service.Data)
+
+	span, _ := data.Default.Tracing.Tracing(ctx, "Service.Process.WithDrawCheckAlgoritmLuna")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	err := luna.Validate(data.Withdraw.Withdraw.IDorder)
 

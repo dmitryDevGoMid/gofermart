@@ -11,7 +11,6 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/password"
-	"github.com/opentracing/opentracing-go"
 )
 
 type User struct {
@@ -23,9 +22,13 @@ type User struct {
 //Запускаем pipeline для процесса регистрации клиента в сервисе
 
 func RegistrationRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
+	//Получаем структуру данных для работы pipeline
+	data := dataService.GetNewService()
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.RegistrationRun")
-	defer span.Finish()
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.RegistrationRun")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	p := pipeline.NewConcurrentPipeline()
 
@@ -56,9 +59,6 @@ func RegistrationRun(ctx context.Context, dataService *service.Data) (chan struc
 	if err := p.Start(ctx); err != nil {
 		return nil, err
 	}
-
-	//Получаем структуру данных для работы pipeline
-	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
 

@@ -9,8 +9,8 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
+	"github.com/dmitryDevGoMid/gofermart/internal/service/process/check"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
-	"github.com/opentracing/opentracing-go"
 )
 
 func AccrualRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
@@ -21,10 +21,19 @@ func AccrualRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex
 		sync.Unlock()
 	}()
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.AccrualRun")
-	defer span.Finish()
+	data := dataService.GetNewService()
+
+	span, _ := data.Default.Tracing.Tracing(ctx, "Service.Process.AccrualRun")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	p := pipeline.NewConcurrentPipeline()
+
+	//Проверяем ContentType запроса
+	p.AddPipe(check.CheckContentTypeOrders{}, &pipeline.PipelineOpts{
+		MaxWorkers: 1,
+	})
 
 	//Проверяем наличие токена
 	p.AddPipe(authentication.CheckJWTToken{}, &pipeline.PipelineOpts{
@@ -36,21 +45,22 @@ func AccrualRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex
 		MaxWorkers: 1,
 	})
 
-	//Сохраняем тело запроса в стек с данными body
+	//Проверяем номер заказа по алгоритму luna
 	p.AddPipe(AccrualCheckAlgoritmLuna{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
-	//Сохраняем тело запроса в стек с данными body
+	//Обращаемся к базе и проверяем наличие заказа
 	p.AddPipe(HandlerAccrual{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
-	//Сохраняем тело запроса в стек с данными body
+	//Сохраняем запрос в базе
 	p.AddPipe(OrderCRUDAccrual{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
 
+	//Формируем успешный ответ клиенту
 	p.AddPipe(ResponseAccrual{}, &pipeline.PipelineOpts{
 		MaxWorkers: 1,
 	})
@@ -59,10 +69,7 @@ func AccrualRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex
 		return nil, err
 	}
 
-	data := dataService.GetNewService()
-
 	defaultSet := &data.Default
-	//getMetrics := data.GetMetrics
 
 	//Отправялем данные в пайплайн для обработки
 	p.Input() <- data

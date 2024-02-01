@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
+	jaegerTraicing "github.com/dmitryDevGoMid/gofermart/internal/pkg/jaeger"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/accrual"
@@ -16,8 +17,6 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/registration"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/withdraw"
 	"github.com/gin-gonic/gin"
-	"github.com/opentracing/opentracing-go"
-	"github.com/uber/jaeger-client-go"
 )
 
 var syncLogin, syncOrdersAccrual, syncWithDraw sync.Mutex
@@ -33,12 +32,14 @@ type GoferHandler interface {
 }
 
 type goferHandler struct {
+	tracing    jaegerTraicing.TraicingInterface
 	cfg        *config.Config
 	repository repository.Repository
 }
 
-func NewGoferHandler(cfg *config.Config, repository repository.Repository) GoferHandler {
+func NewGoferHandler(cfg *config.Config, repository repository.Repository, tracing jaegerTraicing.TraicingInterface) GoferHandler {
 	return &goferHandler{
+		tracing:    tracing,
 		cfg:        cfg,
 		repository: repository,
 	}
@@ -65,16 +66,14 @@ func SetHandlers(r *gin.Engine, gh GoferHandler) {
 }
 
 func (gh *goferHandler) Register(c *gin.Context) {
-	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.Register")
-	span.SetOperationName("Handler.Mandler.Register")
+	span, ctx := gh.tracing.Tracing(c.Request.Context(), "Handler.Register")
 
-	if sc, ok := span.Context().(jaeger.SpanContext); ok {
-		fmt.Println("EMPTY!", sc.TraceID())
-		fmt.Println("EMPTY!", sc.SpanID())
+	if span != nil {
+		defer span.Finish()
 	}
-	defer span.Finish()
 
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
 
 	finished, err := registration.RegistrationRun(ctx, dataService)
 	if err != nil {
@@ -86,16 +85,14 @@ func (gh *goferHandler) Register(c *gin.Context) {
 }
 
 func (gh *goferHandler) Login(c *gin.Context) {
-	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.Login")
-	span.SetOperationName("Handler.Mandler.Login")
+	span, ctx := gh.tracing.Tracing(c.Request.Context(), "Handler.Login")
 
-	if sc, ok := span.Context().(jaeger.SpanContext); ok {
-		fmt.Println("EMPTY!", sc.TraceID())
-		fmt.Println("EMPTY!", sc.SpanID())
+	if span != nil {
+		defer span.Finish()
 	}
-	defer span.Finish()
 
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
 
 	finished, err := login.LoginRun(ctx, dataService, &syncLogin)
 	if err != nil {
@@ -108,16 +105,16 @@ func (gh *goferHandler) Login(c *gin.Context) {
 }
 
 func (gh *goferHandler) OrdersPost(c *gin.Context) {
-	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.OrdersPost")
-	span.SetOperationName("Handler.Mandler.OrdersPost")
 
-	if sc, ok := span.Context().(jaeger.SpanContext); ok {
-		fmt.Println("EMPTY!", sc.TraceID())
-		fmt.Println("EMPTY!", sc.SpanID())
+	span, ctx := gh.tracing.Tracing(c.Request.Context(), "Handler.OrdersPost")
+
+	if span != nil {
+		span.SetOperationName("Handler.Mandler.OrdersPost")
+		defer span.Finish()
 	}
-	defer span.Finish()
 
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
 
 	finished, err := accrual.AccrualRun(ctx, dataService, &syncOrdersAccrual)
 	if err != nil {
@@ -130,16 +127,16 @@ func (gh *goferHandler) OrdersPost(c *gin.Context) {
 }
 
 func (gh *goferHandler) OrdersGet(c *gin.Context) {
-	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.OrdersGet")
-	span.SetOperationName("Handler.Mandler.OrdersGet")
 
-	if sc, ok := span.Context().(jaeger.SpanContext); ok {
-		fmt.Println("EMPTY!", sc.TraceID())
-		fmt.Println("EMPTY!", sc.SpanID())
+	span, ctx := gh.tracing.Tracing(c.Request.Context(), "Handler.OrdersGet")
+
+	if span != nil {
+		span.SetOperationName("Handler.Mandler.OrdersGet")
+		defer span.Finish()
 	}
-	defer span.Finish()
 
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
 
 	finished, err := getlistallorders.GetAllListOrtdersRun(ctx, dataService)
 	if err != nil {
@@ -152,17 +149,14 @@ func (gh *goferHandler) OrdersGet(c *gin.Context) {
 }
 
 func (gh *goferHandler) Balance(c *gin.Context) {
-	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.Balance")
-	span.SetOperationName("Handler.Mandler.Balance")
+	span, ctx := gh.tracing.Tracing(c.Request.Context(), "Handler.Balance")
 
-	if sc, ok := span.Context().(jaeger.SpanContext); ok {
-		fmt.Println("EMPTY!", sc.TraceID())
-		fmt.Println("EMPTY!", sc.SpanID())
+	if span != nil {
+		defer span.Finish()
 	}
-	defer span.Finish()
 
-	//Передаем трассировку в трессинг
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
 
 	finished, err := balance.BalanceRun(ctx, dataService)
 	if err != nil {
@@ -175,16 +169,15 @@ func (gh *goferHandler) Balance(c *gin.Context) {
 }
 
 func (gh *goferHandler) BalanceWithDraw(c *gin.Context) {
-	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.BalanceWithDraw")
-	span.SetOperationName("Handler.Mandler.BalanceWithDraw")
+	span, ctx := gh.tracing.Tracing(c.Request.Context(), "Handler.BalanceWithDraw")
 
-	if sc, ok := span.Context().(jaeger.SpanContext); ok {
-		fmt.Println("EMPTY!", sc.TraceID())
-		fmt.Println("EMPTY!", sc.SpanID())
+	if span != nil {
+		span.SetOperationName("Handler.Mandler.BalanceWithDraw")
+		defer span.Finish()
 	}
-	defer span.Finish()
 
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
 
 	finished, err := withdraw.WithdrawRun(ctx, dataService, &syncWithDraw)
 
@@ -199,16 +192,16 @@ func (gh *goferHandler) BalanceWithDraw(c *gin.Context) {
 }
 
 func (gh *goferHandler) WithDrawals(c *gin.Context) {
-	span, ctx := opentracing.StartSpanFromContext(c.Request.Context(), "Handler.WithDrawals")
-	span.SetOperationName("Handler.Mandler.WithDrawals")
 
-	if sc, ok := span.Context().(jaeger.SpanContext); ok {
-		fmt.Println("EMPTY!", sc.TraceID())
-		fmt.Println("EMPTY!", sc.SpanID())
+	span, ctx := gh.tracing.Tracing(c.Request.Context(), "Handler.WithDrawals")
+
+	if span != nil {
+		span.SetOperationName("Handler.Mandler.WithDrawals")
+		defer span.Finish()
 	}
-	defer span.Finish()
 
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository)
+	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
+	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
 
 	finished, err := getlistallwithdrawals.GetAllListWithdrawalsRun(ctx, dataService)
 

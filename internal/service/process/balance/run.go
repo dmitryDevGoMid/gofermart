@@ -8,12 +8,15 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
-	"github.com/opentracing/opentracing-go"
 )
 
 func BalanceRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.BalanceRun")
-	defer span.Finish()
+	data := dataService.GetNewService()
+
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.BalanceRun")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	//p := pipeline.NewConcurrentPipeline()
 	p := pipeline.NewConcurrentPipeline()
@@ -34,10 +37,6 @@ func BalanceRun(ctx context.Context, dataService *service.Data) (chan struct{}, 
 	if err := p.Start(ctx); err != nil {
 		return nil, err
 	}
-
-	data := dataService.GetNewService()
-
-	data.Default.TraceCtx = &ctx
 
 	defaultSet := &data.Default
 	data.Default.Ctx.Writer.Header().Set("Content-Type", "application/json")

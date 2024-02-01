@@ -121,11 +121,12 @@ func (mr *MockRepositoryMockRecorder) InsertWithdraw(ctx, withdraw interface{}) 
 }
 
 // SelectAccrualByIDorder mocks base method.
-func (m *MockRepository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *repository.Accrual) error {
+func (m *MockRepository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *repository.Accrual) (*repository.Accrual, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectAccrualByIDorder", ctx, dataAccrual)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*repository.Accrual)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SelectAccrualByIDorder indicates an expected call of SelectAccrualByIDorder.
@@ -165,11 +166,12 @@ func (mr *MockRepositoryMockRecorder) SelectAccrualByUserSum(ctx, dataUser inter
 }
 
 // SelectAccrualForSendLoyalty mocks base method.
-func (m *MockRepository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccrual *[]repository.Accrual) error {
+func (m *MockRepository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccrual *[]repository.Accrual) (*[]repository.Accrual, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SelectAccrualForSendLoyalty", ctx, dataAccrual)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*[]repository.Accrual)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // SelectAccrualForSendLoyalty indicates an expected call of SelectAccrualForSendLoyalty.

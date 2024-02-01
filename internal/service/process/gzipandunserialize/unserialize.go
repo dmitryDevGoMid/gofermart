@@ -9,6 +9,7 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 type UnserializeUser struct{}
@@ -47,8 +48,14 @@ func (chain UnserializeLogin) Process(ctx context.Context, result pipeline.Messa
 	err := json.Unmarshal(data.Default.Body, &user)
 
 	if err != nil {
-		data.Default.Response = func() {
+		/*data.Default.Response = func() {
 			data.Default.Ctx.Status(http.StatusBadRequest)
+		}*/
+		data.Default.Response = func() {
+			data.Default.Ctx.JSON(http.StatusBadRequest, gin.H{
+				"code":    http.StatusBadRequest,
+				"message": string("Bad Request"), // cast it to string before showing
+			})
 		}
 		return []pipeline.Message{data}, err
 	}

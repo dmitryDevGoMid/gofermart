@@ -11,7 +11,6 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/authentication"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/gzipandunserialize"
 	"github.com/dmitryDevGoMid/gofermart/internal/service/process/password"
-	"github.com/opentracing/opentracing-go"
 )
 
 func LoginRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) (chan struct{}, error) {
@@ -20,8 +19,12 @@ func LoginRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) 
 
 	defer sync.Unlock()
 
-	span, _ := opentracing.StartSpanFromContext(ctx, "Service.Process.LoginRun")
-	defer span.Finish()
+	data := dataService.GetNewService()
+
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.LoginRun")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	p := pipeline.NewConcurrentPipeline()
 
@@ -52,8 +55,6 @@ func LoginRun(ctx context.Context, dataService *service.Data, sync *sync.Mutex) 
 	if err := p.Start(ctx); err != nil {
 		return nil, err
 	}
-
-	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
 

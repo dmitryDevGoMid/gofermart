@@ -9,19 +9,20 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
-	"github.com/opentracing/opentracing-go"
 )
 
 type AccrualCheckAlgoritmLuna struct{}
 
 // Обрабатываем поступивший
 func (m AccrualCheckAlgoritmLuna) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
-	fmt.Println("Execute HandlerAccrual")
-
-	span, _ := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerAccrual")
-	defer span.Finish()
+	fmt.Println("Execute AccrualCheckAlgoritmLuna")
 
 	data := result.(*service.Data)
+
+	span, _ := data.Default.Tracing.Tracing(ctx, "Service.Process.AccrualCheckAlgoritmLuna")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	accrual := &repository.Accrual{}
 

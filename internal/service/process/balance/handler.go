@@ -9,7 +9,6 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
-	"github.com/opentracing/opentracing-go"
 )
 
 type HandlerBalance struct{}
@@ -18,10 +17,12 @@ type HandlerBalance struct{}
 func (m HandlerBalance) Process(ctx context.Context, result pipeline.Message) ([]pipeline.Message, error) {
 	fmt.Println("Execute HandlerAccrual")
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.HandlerBalance")
-	defer span.Finish()
-
 	data := result.(*service.Data)
+
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.HandlerBalance")
+	if span != nil {
+		defer span.Finish()
+	}
 
 	//Сумма списаний
 	totalWithdraw, err := data.Default.Repository.SelectWithdrawByUserSum(ctx, &data.User.User)
@@ -29,7 +30,7 @@ func (m HandlerBalance) Process(ctx context.Context, result pipeline.Message) ([
 	if err != nil {
 
 		data.Default.Response = func() {
-			data.Default.Ctx.Status(http.StatusBadRequest)
+			data.Default.Ctx.Status(http.StatusInternalServerError)
 		}
 
 		return []pipeline.Message{data}, err
@@ -41,7 +42,7 @@ func (m HandlerBalance) Process(ctx context.Context, result pipeline.Message) ([
 	if err != nil {
 
 		data.Default.Response = func() {
-			data.Default.Ctx.Status(http.StatusBadRequest)
+			data.Default.Ctx.Status(http.StatusInternalServerError)
 		}
 
 		return []pipeline.Message{data}, err

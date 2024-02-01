@@ -13,6 +13,14 @@ import (
 //Запускаем pipeline для процесса регистрации клиента в сервисе
 
 func GetAllListWithdrawalsRun(ctx context.Context, dataService *service.Data) (chan struct{}, error) {
+
+	data := dataService.GetNewService()
+
+	span, _ := data.Default.Tracing.Tracing(ctx, "Service.Process.GetAllListWithdrawalsRun")
+	if span != nil {
+		defer span.Finish()
+	}
+
 	p := pipeline.NewConcurrentPipeline()
 
 	//Проверяем наличие токена
@@ -33,8 +41,6 @@ func GetAllListWithdrawalsRun(ctx context.Context, dataService *service.Data) (c
 	if err := p.Start(ctx); err != nil {
 		return nil, err
 	}
-
-	data := dataService.GetNewService()
 
 	defaultSet := &data.Default
 	data.Default.Ctx.Writer.Header().Set("Content-Type", "application/json")

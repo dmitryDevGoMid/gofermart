@@ -32,8 +32,8 @@ type Repository interface {
 	SelectUserByEmail(ctx context.Context, dataUser *User) (*User, error)
 
 	SelectAccrualByUser(ctx context.Context, dataUser *User) ([]AccrualList, error)
-	SelectAccrualByIDorder(ctx context.Context, dataAccrual *Accrual) error
-	SelectAccrualForSendLoyalty(ctx context.Context, dataAccrual *[]Accrual) error
+	SelectAccrualByIDorder(ctx context.Context, dataAccrual *Accrual) (*Accrual, error)
+	SelectAccrualForSendLoyalty(ctx context.Context, dataAccrual *[]Accrual) (*[]Accrual, error)
 
 	SelectWithdrawByUsers(ctx context.Context, dataUser *User) ([]WithdrawList, error)
 	SelectBalanceByUser(ctx context.Context, dataUser *User) (Balance, error)
@@ -100,8 +100,13 @@ func (rep *repository) UpdateAccrualByID(ctx context.Context, dataAccrual *Accru
 
 // Получаем запись по email клиента
 func (rep *repository) SelectUserByEmail(ctx context.Context, dataUser *User) (*User, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectUserByEmail")
+	/*span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectUserByEmail")
 	defer span.Finish()
+
+	span, ctx := data.Default.Tracing.Tracing(ctx, "Service.Process.HandlerBalance")
+	if span != nil {
+		defer span.Finish()
+	}*/
 
 	// Query for a value based on a single row.
 	if err := rep.db.QueryRow(ctx, "SELECT password, id FROM users WHERE login = $1",
@@ -228,7 +233,7 @@ func (rep *repository) SelectAccrualByUser(ctx context.Context, dataUser *User) 
 }
 
 // Получаем запись из таблицы по номеру заказа
-func (rep *repository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccrual *[]Accrual) error {
+func (rep *repository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccrual *[]Accrual) (*[]Accrual, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectAccrualForSendLoyalty")
 	defer span.Finish()
 
@@ -236,10 +241,10 @@ func (rep *repository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccr
 		rep.catalogData.TypeStatus["NEW"], rep.catalogData.TypeStatus["PROCESSING"], rep.catalogData.TypeStatus["REGISTERED"])
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return err
+			return nil, err
 		}
 		log.Println("Error querying user_accrual", err)
-		return err
+		return nil, err
 	}
 
 	//Accrual := *dataAccrual
@@ -247,12 +252,12 @@ func (rep *repository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccr
 	accrualRows, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Accrual])
 	if err != nil {
 		fmt.Printf("CollectRows error: %v", err)
-		return err
+		return nil, err
 	}
 
 	//Странно, приходится использователь варинат так как ошибка ErrNoRows не возвращается хотя в мануале имеет место быть
 	if len(accrualRows) <= 0 {
-		return errors.New("no accrual rows not found")
+		return nil, errors.New("no accrual rows not found")
 	}
 
 	//Забасываем данные по линку перменной dataAccrual
@@ -262,21 +267,21 @@ func (rep *repository) SelectAccrualForSendLoyalty(ctx context.Context, dataAccr
 		*dataAccrual = append(*dataAccrual, *p)
 	}
 
-	return nil
+	return dataAccrual, nil
 }
 
 // Получаем запись из таблицы по номеру заказа
-func (rep *repository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *Accrual) error {
+func (rep *repository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *Accrual) (*Accrual, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.SelectAccrualByIDorder")
 	defer span.Finish()
 
 	rows, err := rep.db.Query(ctx, "SELECT * FROM user_accrual Where id_order = $1", dataAccrual.IDorder)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			return nil
+			return nil, nil
 		}
 		log.Println("Error querying SelectAccrualByIDorder", err)
-		return err
+		return nil, err
 	}
 
 	//Accrual := *dataAccrual
@@ -284,7 +289,7 @@ func (rep *repository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *
 	accrualRows, err := pgx.CollectRows(rows, pgx.RowToAddrOfStructByName[Accrual])
 	if err != nil {
 		fmt.Printf("CollectRows error: %v", err)
-		return err
+		return nil, err
 	}
 
 	fmt.Println(accrualRows)
@@ -295,7 +300,7 @@ func (rep *repository) SelectAccrualByIDorder(ctx context.Context, dataAccrual *
 		*dataAccrual = *p
 	}
 
-	return nil
+	return dataAccrual, nil
 }
 
 // Получаем список всех списаний клиента по UserId
@@ -406,8 +411,8 @@ func (rep *repository) SelectTypeStatusAll(ctx context.Context) error {
 func (rep *repository) InsertUser(ctx context.Context, dataUser *User) (*User, error) {
 	fmt.Println("DB InsertUser")
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.InsertUser")
-	defer span.Finish()
+	/*span, ctx := opentracing.StartSpanFromContext(ctx, "Repo.InsertUser")
+	defer span.Finish()*/
 
 	var idInsertRow int
 

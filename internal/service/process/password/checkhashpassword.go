@@ -8,6 +8,7 @@ import (
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/pipeline"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/security"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
+	"github.com/gin-gonic/gin"
 )
 
 type Authetication struct{}
@@ -22,7 +23,10 @@ func (m Authetication) Process(ctx context.Context, result pipeline.Message) ([]
 	//Инициализируем ошибку для ответа клиенту
 	if err != nil {
 		data.Default.Response = func() {
-			data.Default.Ctx.Status(http.StatusBadRequest)
+			data.Default.Ctx.JSON(http.StatusUnauthorized, gin.H{
+				"code":    http.StatusUnauthorized,
+				"message": string("Unauthorized"), // cast it to string before showing
+			})
 		}
 		return []pipeline.Message{data}, err
 
