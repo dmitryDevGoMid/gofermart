@@ -13,6 +13,7 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"github.com/opentracing/opentracing-go"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var (
@@ -54,13 +55,13 @@ func RunGrpc(ctx context.Context, appLogger logger.Logger, route *gin.Engine, bo
 
 	<-ctx.Done()
 
-	return
 }
 
 // Опции для запуска gRPC клиента
 func getOpts(logger logger.Logger) ([]grpc.DialOption, error) {
 	return []grpc.DialOption{
-		grpc.WithInsecure(),
+		//grpc.WithInsecure(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
 			middleware.ClientTracing(opentracing.GlobalTracer(), logger),
 		)),
@@ -71,7 +72,7 @@ func getOpts(logger logger.Logger) ([]grpc.DialOption, error) {
 func openTracing(log logger.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		span := opentracing.GlobalTracer().StartSpan("apiServer")
-		c.Request.WithContext(opentracing.ContextWithSpan(c.Request.Context(), span))
+		_ = c.Request.WithContext(opentracing.ContextWithSpan(c.Request.Context(), span))
 		log.Error(c.Request.Context(), "Api:=>%v", c.Request.URL)
 		c.Next()
 	}

@@ -57,23 +57,16 @@ func RunGrpc(ctx context.Context, appLogger logger.Logger) {
 
 	reflection.Register(grpcServer)
 
+	go func() {
+		err := grpcServer.Serve(lis)
+		if err != nil {
+			appLogger.Error(context.Background(), "[rpcServer] port:%e err:%v", fmt.Sprintf(":%d", port), err)
+		}
+	}()
+
 	log.Printf("Starting service running on %d\n", port)
-
-	var errGrpc error
-
-	go func(errGrpc *error) {
-		var err error
-		err = grpcServer.Serve(lis)
-		errGrpc = &err
-	}(&errGrpc)
-
-	if errGrpc != nil {
-		appLogger.Error(context.Background(), "[rpcServer] 开始监听%v错误 %v", fmt.Sprintf(":%d", port), errGrpc)
-	}
 
 	//Жде завершения через контекст
 	<-ctx.Done()
-
-	return
 
 }

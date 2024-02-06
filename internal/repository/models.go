@@ -53,7 +53,7 @@ type Balance struct {
 type ResponseBalance struct {
 	Current   float64 `json:"current"`
 	Withdrawn float64 `json:"withdrawn"`
-	Bonusplus float64 `json:"bonusplus"`
+	//Bonusplus float64 `json:"bonusplus"`
 }
 
 type CatalogData struct {

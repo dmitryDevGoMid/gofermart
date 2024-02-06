@@ -146,3 +146,53 @@
 {"LEVEL":"ERROR","TIME":"2024-02-07T00:32:11.042+0300","CALLER":"client/grpc.go:75","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/withdrawals/"}
 {"LEVEL":"ERROR","TIME":"2024-02-07T00:32:13.822+0300","CALLER":"client/grpc.go:75","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/orders/"}
 {"LEVEL":"ERROR","TIME":"2024-02-07T00:32:16.679+0300","CALLER":"client/grpc.go:75","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/balance/"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:52:35.831+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:52:35.832+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:52:35.835+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:52:35.921+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T00:52:45.712+0300","CALLER":"client/grpc.go:76","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/login/"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T00:52:49.290+0300","CALLER":"client/grpc.go:76","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/withdrawals/"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T00:52:51.663+0300","CALLER":"client/grpc.go:76","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/orders/"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T00:52:54.456+0300","CALLER":"client/grpc.go:76","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/balance/"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:55:25.155+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:55:25.155+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:55:25.158+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:55:25.232+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:56:39.100+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:56:39.101+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:56:39.106+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:56:39.326+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:57:31.692+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:57:31.692+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:57:31.698+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T00:57:31.874+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:03:45.884+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:03:45.885+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:03:45.891+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:03:46.075+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:05:41.145+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:05:41.146+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:05:41.152+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:05:41.341+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:07:03.546+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:07:03.546+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:07:03.552+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:07:03.711+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:10:25.391+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:10:25.398+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:10:25.404+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:10:25.603+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T01:10:27.387+0300","CALLER":"server/grpc.go:64","MESSAGE":"context.Background[rpcServer] 开始监听%v错误 %v:9001accept tcp [::]:9001: use of closed network connection"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:11:54.268+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:11:54.269+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:11:54.275+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:11:54.486+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T01:12:01.705+0300","CALLER":"server/grpc.go:63","MESSAGE":"context.Background[rpcServer] port:%e err:%v:9001accept tcp [::]:9001: use of closed network connection"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:15:24.003+0300","CALLER":"app/main.go:44","MESSAGE":"Start Service API HANDLER"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:15:24.010+0300","CALLER":"app/main.go:45","MESSAGE":"AppVersion: 1.0.0, LogLevel: , DevelopmentMode: %!s(bool=true)"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:15:24.015+0300","CALLER":"app/main.go:57","MESSAGE":"Jaeger connected"}
+{"LEVEL":"INFO","TIME":"2024-02-07T01:15:24.196+0300","CALLER":"client/grpc.go:32","MESSAGE":"Opentracing connected"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T01:15:33.048+0300","CALLER":"client/grpc.go:76","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/login/"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T01:15:38.156+0300","CALLER":"client/grpc.go:76","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/withdrawals/"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T01:15:41.234+0300","CALLER":"client/grpc.go:76","MESSAGE":"context.Background.WithValue(type *http.contextKey, val <not Stringer>).WithValue(type *http.contextKey, val 127.0.0.1:8000).WithCancel.WithCancelApi:=>%v/api/user/balance/"}
+{"LEVEL":"ERROR","TIME":"2024-02-07T01:15:51.359+0300","CALLER":"server/grpc.go:63","MESSAGE":"context.Background[rpcServer] port:%e err:%v:9001accept tcp [::]:9001: use of closed network connection"}

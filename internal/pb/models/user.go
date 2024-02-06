@@ -6,7 +6,7 @@ import (
 
 // Структура данных модели
 type User struct {
-	Id          int32
+	ID          int32
 	Name        string
 	CountOrders int32
 }
@@ -14,7 +14,7 @@ type User struct {
 // Функция преобразования к протобуферу
 func (u *User) ToProtoBuffer() *pb.User {
 	return &pb.User{
-		Id:          u.Id,
+		Id:          u.ID,
 		Name:        u.Name,
 		Countorders: u.CountOrders,
 	}
@@ -22,7 +22,7 @@ func (u *User) ToProtoBuffer() *pb.User {
 
 // Преобразуем из протобуфера
 func (u *User) FromProtoBuffer(user *pb.User) {
-	u.Id = user.Id
+	u.ID = user.Id
 	u.Name = user.GetName()
 	u.CountOrders = user.GetCountorders()
 }
