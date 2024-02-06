@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package db;
+
+option go_package = "./pb";
+
+message User {
+    int32 id = 1;
+    string name = 2;
+    int32 countorders = 3;
+};
+
+message Plus {
+    float bonus = 2;
+};
+
+service BonusPlus {
+    rpc GetBonusPlus(User) returns (Plus);
+};

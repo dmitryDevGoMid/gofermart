@@ -10,11 +10,16 @@ import (
 	"syscall"
 	"time"
 
+	_ "net/http/pprof"
+
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
 	"github.com/dmitryDevGoMid/gofermart/internal/config/db"
 	configyaml "github.com/dmitryDevGoMid/gofermart/internal/config/yaml"
 	"github.com/dmitryDevGoMid/gofermart/internal/handlers"
 	"github.com/dmitryDevGoMid/gofermart/internal/migration"
+	"github.com/dmitryDevGoMid/gofermart/internal/pb/client"
+	"github.com/dmitryDevGoMid/gofermart/internal/pb/pb"
+	"github.com/dmitryDevGoMid/gofermart/internal/pb/server"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/jaeger"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/logger"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
@@ -22,18 +27,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/opentracing/opentracing-go"
 )
-
-// middleware трайсинг
-func openTracing(log logger.Logger) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		span := opentracing.GlobalTracer().StartSpan("apiServer")
-		if span != nil {
-			_ = c.Request.WithContext(opentracing.ContextWithSpan(c.Request.Context(), span))
-			log.Error(c.Request.Context(), "Api:=>%v", c.Request.URL)
-		}
-		c.Next()
-	}
-}
 
 func Run() {
 
@@ -68,6 +61,8 @@ func Run() {
 	////////////////////////////////ТРассировка и логирование////////////////
 
 	ctx, cancel := context.WithCancel(context.Background())
+	//Запускаем GrpcServer на 9000 порту
+	go server.RunGrpc(ctx, appLogger)
 
 	cfg, err := config.ParseConfig()
 
@@ -95,13 +90,18 @@ func Run() {
 
 	router := gin.Default()
 
-	//Указываем мидделвари для трассировки
-	if 1 == 2 {
-		router.Use(openTracing(appLogger))
-	}
+	bonusSrvChan := make(chan pb.BonusPlusClient)
+
+	//Запускаем GrpcClient с трассировкой запросов
+	go client.RunGrpc(ctx, appLogger, router, bonusSrvChan)
+
+	//Получаем клиента для передачи в стек данных для последующих вызовов
+	bonusSrv := <-bonusSrvChan
+
+	close(bonusSrvChan)
 
 	tracing := jaeger.NewTracing(cfg)
-	handlersGofermart := handlers.NewGoferHandler(cfg, repository, tracing)
+	handlersGofermart := handlers.NewGoferHandler(cfg, repository, tracing, bonusSrv)
 
 	//Запускаем обработчики запросов http
 	handlers.SetHandlers(router, handlersGofermart)
