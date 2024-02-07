@@ -65,7 +65,7 @@ func (m HandlerBalance) Process(ctx context.Context, result pipeline.Message) ([
 	}
 
 	//Разница + дополнительный бонус полученный по gRPC по кол-ву заказов
-	calcBalance := (totalAccrual - totalWithdraw) + data.User.BonusPlus
+	calcBalance := (totalAccrual - totalWithdraw) //+ data.User.BonusPlus
 
 	//, Bonusplus: math.Round(float64(data.User.BonusPlus)*100) / 100
 	data.Balance.ResponseBalance = repository.ResponseBalance{Current: math.Round(float64(calcBalance)*100) / 100, Withdrawn: math.Round(float64(totalWithdraw)*100) / 100}
