@@ -55,6 +55,6 @@ func (t *tracing) Tracing(ctx context.Context, label string) (opentracing.Span, 
 		return nil, ctx
 	}
 
-	span, ctx := opentracing.StartSpanFromContext(ctx, "Service.Process.AccrualRun")
+	span, ctx := opentracing.StartSpanFromContext(ctx, label)
 	return span, ctx
 }

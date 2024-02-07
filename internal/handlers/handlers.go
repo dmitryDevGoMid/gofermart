@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
+	"github.com/dmitryDevGoMid/gofermart/internal/pb/pb"
 	jaegerTraicing "github.com/dmitryDevGoMid/gofermart/internal/pkg/jaeger"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/dmitryDevGoMid/gofermart/internal/service"
@@ -35,13 +36,15 @@ type goferHandler struct {
 	tracing    jaegerTraicing.TraicingInterface
 	cfg        *config.Config
 	repository repository.Repository
+	pbCleint   pb.BonusPlusClient
 }
 
-func NewGoferHandler(cfg *config.Config, repository repository.Repository, tracing jaegerTraicing.TraicingInterface) GoferHandler {
+func NewGoferHandler(cfg *config.Config, repository repository.Repository, tracing jaegerTraicing.TraicingInterface, pbCleint pb.BonusPlusClient) GoferHandler {
 	return &goferHandler{
 		tracing:    tracing,
 		cfg:        cfg,
 		repository: repository,
+		pbCleint:   pbCleint,
 	}
 }
 
@@ -65,6 +68,11 @@ func SetHandlers(r *gin.Engine, gh GoferHandler) {
 	}
 }
 
+// Возвраащем линк на стек с данными
+func (gh *goferHandler) getServiceData(c *gin.Context) *service.Data {
+	return service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing, gh.pbCleint)
+}
+
 func (gh *goferHandler) Register(c *gin.Context) {
 	span, ctx := gh.tracing.Tracing(c.Request.Context(), "Handler.Register")
 
@@ -73,7 +81,7 @@ func (gh *goferHandler) Register(c *gin.Context) {
 	}
 
 	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
+	dataService := gh.getServiceData(c)
 
 	finished, err := registration.RegistrationRun(ctx, dataService)
 	if err != nil {
@@ -92,7 +100,7 @@ func (gh *goferHandler) Login(c *gin.Context) {
 	}
 
 	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
+	dataService := gh.getServiceData(c)
 
 	finished, err := login.LoginRun(ctx, dataService, &syncLogin)
 	if err != nil {
@@ -112,9 +120,8 @@ func (gh *goferHandler) OrdersPost(c *gin.Context) {
 		span.SetOperationName("Handler.Mandler.OrdersPost")
 		defer span.Finish()
 	}
-
 	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
+	dataService := gh.getServiceData(c)
 
 	finished, err := accrual.AccrualRun(ctx, dataService, &syncOrdersAccrual)
 	if err != nil {
@@ -136,7 +143,7 @@ func (gh *goferHandler) OrdersGet(c *gin.Context) {
 	}
 
 	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
+	dataService := gh.getServiceData(c)
 
 	finished, err := getlistallorders.GetAllListOrtdersRun(ctx, dataService)
 	if err != nil {
@@ -154,9 +161,8 @@ func (gh *goferHandler) Balance(c *gin.Context) {
 	if span != nil {
 		defer span.Finish()
 	}
-
 	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
+	dataService := gh.getServiceData(c)
 
 	finished, err := balance.BalanceRun(ctx, dataService)
 	if err != nil {
@@ -177,7 +183,7 @@ func (gh *goferHandler) BalanceWithDraw(c *gin.Context) {
 	}
 
 	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
+	dataService := gh.getServiceData(c)
 
 	finished, err := withdraw.WithdrawRun(ctx, dataService, &syncWithDraw)
 
@@ -201,7 +207,7 @@ func (gh *goferHandler) WithDrawals(c *gin.Context) {
 	}
 
 	//Инициализируем один раз объект для доступа к репозитарию, конфигу...
-	dataService := service.SetServiceData(c, gh.cfg, gh.repository, gh.tracing)
+	dataService := gh.getServiceData(c)
 
 	finished, err := getlistallwithdrawals.GetAllListWithdrawalsRun(ctx, dataService)
 

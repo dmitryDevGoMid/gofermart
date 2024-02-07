@@ -9,13 +9,11 @@ import (
 	"time"
 
 	"github.com/dmitryDevGoMid/gofermart/internal/config"
+	"github.com/dmitryDevGoMid/gofermart/internal/pb/pb"
 	"github.com/dmitryDevGoMid/gofermart/internal/pkg/jaeger"
 	"github.com/dmitryDevGoMid/gofermart/internal/repository"
 	"github.com/gin-gonic/gin"
 )
-
-type iData struct {
-}
 
 type Data struct {
 	Default        Default
@@ -45,11 +43,13 @@ func (current *Data) GetNewService() *Data {
 	data.Default.Repository = current.Default.Repository
 	// Трассировка
 	data.Default.Tracing = current.Default.Tracing
+	// Клиент Grpc для запросов к серверу
+	data.Default.PbCleint = current.Default.PbCleint
 
 	return data
 }
 
-func SetServiceData(c *gin.Context, cfg *config.Config, rep repository.Repository, tracing jaeger.TraicingInterface) *Data {
+func SetServiceData(c *gin.Context, cfg *config.Config, rep repository.Repository, tracing jaeger.TraicingInterface, pbCleint pb.BonusPlusClient) *Data {
 	//func SetServiceData(c context.Context, cfg *config.Config, rep repository.Repository) *Data {
 	data := &Data{}
 
@@ -61,6 +61,8 @@ func SetServiceData(c *gin.Context, cfg *config.Config, rep repository.Repositor
 	data.Default.Repository = rep
 	// Трассировка
 	data.Default.Tracing = tracing
+	// Клиент Grpc для запросов к серверу
+	data.Default.PbCleint = pbCleint
 
 	return data
 }
@@ -84,7 +86,9 @@ type Withdraw struct {
 type User struct {
 	User         repository.User
 	UserRequest  repository.User
+	PbUser       *pb.User
 	HashPassword string
+	BonusPlus    float32
 }
 
 type Claims struct {
@@ -109,6 +113,7 @@ type Default struct {
 	Finished      chan struct{}
 	Body          []byte
 	Tracing       jaeger.TraicingInterface
+	PbCleint      pb.BonusPlusClient
 }
 
 type Loyalty struct {
